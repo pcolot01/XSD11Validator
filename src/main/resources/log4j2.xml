@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="error">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout>
+        <LevelPatternSelector defaultPattern="%sn. %highlight{%d{HH:mm:ss} %c:%L %m}{bright,red}%n">
+           <PatternMatch key="WARN"  pattern="%sn. %highlight{%d{HH:mm:ss} %c:%L %m}{bright,yellow}%n" />
+           <PatternMatch key="INFO"  pattern="%sn. %style{%d{HH:mm:ss} %c:%L %m%n}{blue}" />
+           <PatternMatch key="DEBUG" pattern="%sn.     %d{HH:mm:ss}     %c:%L %m%n" />
+           <PatternMatch key="TRACE" pattern="%sn.         %d{HH:mm:ss}     %c:%L %m%n" />
+        </LevelPatternSelector>
+      </PatternLayout>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Root level="INFO">
+      <AppenderRef ref="Console" />
+    </Root>
+  </Loggers>
+</Configuration>
