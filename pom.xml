@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>lu.infeurope</groupId>
+        <artifactId>QualityControlReports</artifactId>
+        <version>1.3</version>
+    	<relativePath>../QualityControlReports/</relativePath>
+    </parent>
+	
+	<groupId>eu.europa.publications.ifc.cov</groupId>
+	<artifactId>XSD11Validator</artifactId>
+	<version>2.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>Xerces validator</name>
+
+	<properties>
+
+		<commons-cli.version>1.6.0</commons-cli.version>
+		<java-cup.version>10k</java-cup.version>
+		<junit-jupiter-api.version>5.10.1</junit-jupiter-api.version>
+		<junit-jupiter-engine.version>5.10.1</junit-jupiter-engine.version>
+		<xercesImpl.version>2.12.2</xercesImpl.version>
+		<xml-apis.version>1.4.01</xml-apis.version><!-- 2.0.2 is a fake to 1.0.b2 -->
+		<xml-resolver.version>1.2</xml-resolver.version>
+		<xpath2.version>1.2.0</xpath2.version>
+		
+	</properties>
+
+	<dependencies>
+<!-- Logger -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+
+<!-- Parser for Main command line parameter -->
+		<dependency>
+		    <groupId>commons-cli</groupId>
+		    <artifactId>commons-cli</artifactId>
+		    <version>${commons-cli.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>xml-apis</groupId>
+		    <artifactId>xml-apis</artifactId>
+		    <version>${xml-apis.version}</version>
+		    <scope>runtime</scope>
+		</dependency>
+		
+		<!-- Resolver to find resource through  catalog indirection -->
+		<dependency>
+		    <groupId>xml-resolver</groupId>
+		    <artifactId>xml-resolver</artifactId>
+		    <version>${xml-resolver.version}</version>
+		    <scope>runtime</scope>
+		</dependency>
+
+
+<!-- XSD1.1 Validation -->
+		<!--  The official supporting 1.1 but deployed under maven-central without the 1.1 support
+			   https://blog.adamretter.org.uk/xerces-xsd11-maven/
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>${xercesImpl.version}</version>
+		</dependency>
+		-->
+		
+<!-- Workaround of the same library but with the 1.1 support
+			 https://blog.adamretter.org.uk/xerces-xsd11-maven/ -->
+		<dependency>
+		    <groupId>org.exist-db.thirdparty.xerces</groupId>
+		    <artifactId>xercesImpl</artifactId>
+		    <version>${xercesImpl.version}</version>
+		    <classifier>xml-schema-1.1</classifier>
+		</dependency>
+		
+		<!-- xpath2 and java-cup are needed at runtime
+		        for xercesImpl Schema 1.1 support -->
+		<dependency>
+		    <groupId>org.exist-db.thirdparty.org.eclipse.wst.xml</groupId>
+		    <artifactId>xpath2</artifactId>
+		    <version>${xpath2.version}</version>
+		    <scope>runtime</scope>
+		</dependency>
+		<dependency>
+		    <groupId>edu.princeton.cup</groupId>
+		    <artifactId>java-cup</artifactId>
+		    <version>${java-cup.version}</version>
+		    <scope>runtime</scope>
+		</dependency>
+		
+<!-- Test framework -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${junit-jupiter-api.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit-jupiter-engine.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<finalName>maven-xerces</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${project.build.sourceVersion}</source>
+					<target>${project.build.targetVersion}</target>
+				</configuration>
+			</plugin>
+			
+<!-- Packaging using manual approach needs the associated libs in ./libs next to this jar to be executed			
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-dependency-plugin</artifactId>
+			    <executions>
+			        <execution>
+			            <id>copy-dependencies</id>
+			            <phase>prepare-package</phase>
+			            <goals>
+			                <goal>copy-dependencies</goal>
+			            </goals>
+			            <configuration>
+			                <outputDirectory>
+			                    ${project.build.directory}/libs
+			                </outputDirectory>
+			            </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-jar-plugin</artifactId>
+			    <configuration>
+			        <archive>
+			            <manifest>
+			                <addClasspath>true</addClasspath>
+			                <classpathPrefix>libs/</classpathPrefix>
+			                <mainClass>
+			                    eu.europa.publications.ifc.cov.xerces.Main
+			                </mainClass>
+			            </manifest>
+			        </archive>
+			    </configuration>
+			</plugin>-->
+			
+<!-- Packaging using assembly way: all in jar dependencies content copied inside the executable jar without control
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-assembly-plugin</artifactId>
+			    <executions>
+			        <execution>
+			            <phase>package</phase>
+			            <goals>
+			                <goal>single</goal>
+			            </goals>
+			            <configuration>
+			                <archive>
+			                	<manifestEntries>
+			                		<Multi-Release>true</Multi-Release>
+			                	</manifestEntries>
+				                <manifest>
+				                	<mainClass>eu.europa.publications.ifc.cov.xerces.Main</mainClass>
+				                </manifest>
+			                </archive>
+			                <descriptorRefs>
+			                    <descriptorRef>jar-with-dependencies</descriptorRef>
+			                </descriptorRefs>
+			            </configuration>
+			        </execution>
+			    </executions>
+			</plugin> -->
+			
+<!-- Packaging using shade way: lot of controls and lot of useless warning if not extensively configured -->
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-shade-plugin</artifactId>
+			    <version>3.5.1</version>
+			    <executions>
+			        <execution>
+			            <goals>
+			                <goal>shade</goal>
+			            </goals>
+			            <configuration>
+			                <shadedArtifactAttached>true</shadedArtifactAttached>
+			                <transformers>
+			                	<transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer">
+			                	</transformer>
+				                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+				                    <addHeader>false</addHeader>
+				                </transformer>			                	
+			                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+			                      <manifestEntries>
+			                        <Main-Class>eu.europa.publications.ifc.cov.xerces.Main</Main-Class>
+			                        <Multi-Release>true</Multi-Release>
+			                      </manifestEntries>
+				                </transformer>
+				            </transformers>
+				        </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+			    <configuration>
+			        <excludes>
+			            <exclude>**/__selectionPattern__.java</exclude>
+			        </excludes>
+			    	<systemPropertyVariables>
+        				<log4j.configurationFile>./src/test/resources/eu/europa/publications/ifc/cov/xerces/log4j2.xml</log4j.configurationFile>
+      			  </systemPropertyVariables>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+
