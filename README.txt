@@ -134,14 +134,15 @@ usage: XSD11Validator
 
 
 
-D:\OP\_DEV\XSD11Validator>java -jar target\XSD11Validator-2.0-SNAPSHOT-shaded.jar -i .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xml -s .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xsd -c .\src\main\resources\eu\europa\publications\ifc\cov\xerces\catalog.xml
+D:\OP\_DEV\XSD11Validator>java -jar target\XSD11Validator-2.0-SNAPSHOT-shaded.jar -i .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xml -s .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xsd -c .\src\test\resources\eu\europa\publications\ifc\cov\xerces\catalog.xml
 1. ←[34m11:33:03 eu.europa.publications.ifc.cov.xerces.XSD11Validator:83 XSD 1.1 validation using catalog on File .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xml using schema .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xsd and catalog .\src\main\resources\eu\europa\publications\ifc\cov\xerces\catalog.xml
 ←[m2. ←[34m11:33:03 eu.europa.publications.ifc.cov.xerces.Main:110 return Code: 0
 ←[m
+
 D:\OP\_DEV\XSD11Validator>java  -Dlog4j.configurationFile=./src/test/resources/eu/europa/publications/ifc/cov/xerces/log4j2.xml 
--jar target\XSD11Validator-2.0-SNAPSHOT-shaded.jar -i .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xml -s .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xsd -c .\src\main\resources\eu\europa\publications\ifc\cov\xerces\catalog.xml
-1. ←[34m11:34:14 eu.europa.publications.ifc.cov.xerces.XSD11Validator:83 XSD 1.1 validation using catalog on File .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xml using schema .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xsd and catalog .\src\main\resources\eu\europa\publications\ifc\cov\xerces\catalog.xml
-←[m2.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:292 XML Catalog Root Dir: D:\OP\_DEV\XSD11Validator\.\src\main\resources\eu\europa\publications\ifc\cov\xerces
+-jar target\XSD11Validator-2.0-SNAPSHOT-shaded.jar -i .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xml -s .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xsd -c .\src\test\resources\eu\europa\publications\ifc\cov\xerces\catalog.xml
+1. ←[34m11:34:14 eu.europa.publications.ifc.cov.xerces.XSD11Validator:83 XSD 1.1 validation using catalog on File .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xml using schema .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xsd and catalog .\src\test\resources\eu\europa\publications\ifc\cov\xerces\catalog.xml
+←[m2.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:292 XML Catalog Root Dir: D:\OP\_DEV\XSD11Validator\.\src\test\resources\eu\europa\publications\ifc\cov\xerces
 3.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:404 Get XML schema namespace associated to root element
 4.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:407 NamespaceURI : http://ifc.europa.eu/common_vocabulary
 5.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:539 getAbsoluteUriFromRelativeorAbsolute: HTTP: http://ifc.europa.eu/common_vocabulary from http://ifc.europa.eu/common_vocabulary based on: file:///D:/OP/_DEV/XSD11Validator/src/test/resources/eu/europa/publications/ifc/cov/xerces/
@@ -176,14 +177,14 @@ TODO:
 CodeQualityReview for QC Review
   Review codestyle rules to comply with my usage
   Improve code by removing coding imperfections
-  CleanUp import dependencies
 
 
-Support external ref http(s):// as schema, catalog, xml input
 Manage DTD systemId publicId
 Tests
  noNamespaceSchemaLocation tests
  defaultnamespace tests
  Test with different kind of catalog
-
+ Test with http resources
+ 
+ ++ Test with official suite
 

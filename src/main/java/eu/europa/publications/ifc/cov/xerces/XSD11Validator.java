@@ -101,9 +101,6 @@ public final class XSD11Validator {
             } else {
                 LOGGER.trace(MARKER, "Validate ended without errors");
             }
-            
-            // 4. Nominal end
-            LOGGER.trace(MARKER, "XML document successfully validated.");
         
         // 5. Alternate flows
         } catch (SAXException e) {
@@ -250,6 +247,8 @@ public final class XSD11Validator {
                 }
                 
                 return xsdInputURL;
+            } catch ( ApplicationHandler a) {
+                throw a;
             } catch (Exception e) {
                 throw new ApplicationHandler(e);
             }
@@ -270,43 +269,57 @@ public final class XSD11Validator {
     private static URL getXsdInternalURL(
             StreamSource xmlInputStreamSource,
             XMLCatalogResolver catalogResolver) throws ApplicationHandler {
-        try {
-            String xmlInput = xmlInputStreamSource.getPublicId();
-            
+        try {            
             // 1. Extract Xsd UrL
-            LOGGER.trace(MARKER, "Get internal Xsd URL from XML Stream " + xmlInput);
+            LOGGER.trace(MARKER, "Get internal Xsd URL from XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId());
             LOGGER.trace(MARKER, "  and catalog: " + catalogResolver);
             
             //2. Get the XML root qualified namespace [TODO add DTD alternative]
             XMLStreamReader root = getRoot(xmlInputStreamSource);
             
             //3. Get the namespace
-            LOGGER.trace(MARKER, "Get NamespaceURI : ");
             QName qname = root.getName();
             String namespaceURI = qname.getNamespaceURI();
+
+            LOGGER.trace(MARKER, "Get root name : " + qname .toString());
             
             if (namespaceURI.isEmpty()) {
                 // noschemalocation used
-                LOGGER.trace(MARKER, "If no namespace is associated to root element" + " use noNamespaceSchemaLocation");
+                LOGGER.trace(MARKER, "No namespace is associated to root element, use noNamespaceSchemaLocation");
+                
                 namespaceURI = root.getAttributeValue( "http://www.w3.org/2001/XMLSchema-instance", "noNamespaceSchemaLocation");
+                
+                if (namespaceURI != null) {
+                    LOGGER.trace(MARKER, "noNamespaceSchemaLocation is " + namespaceURI);
+                } else {
+                    throw new ApplicationHandler("Neither a namspace is attached to the root nor a default no namespace location is provided");
+                }
+                
             } else {
                 //get schemalocations
-                LOGGER.trace(MARKER, "If a namespace is associated to root element Get SchemaLocations");
+                LOGGER.trace(MARKER, "The following namespace is associated to the root element: " + namespaceURI);
+                
                 String schemaLocations = root.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation");
                 
-                if (!schemaLocations.isEmpty()) {
+                if (schemaLocations != null) {
                     //schemaLocations present
+                    LOGGER.trace(MARKER, "The schemalocations associated to root element is: " + schemaLocations);
+                    
                     String resolved = resolveLocation(schemaLocations, namespaceURI);
                     if (!resolved.isEmpty()) {
                         //schemaLocations used
+                        LOGGER.trace(MARKER, "The URI " + namespaceURI + " is resolved by schemalocations as: " + resolved);
+                        
                         namespaceURI = resolved;
                     } else {
                         // schemaLocations not used
                         // keep current namespaceURI
+                        LOGGER.trace(MARKER, "The URI " + namespaceURI + " is not resolved by schemalocations and stay unchanged");
                     }
                 } else {
                     // schemaLocations not present
                     // keep current namespaceURI
+                    LOGGER.trace(MARKER, "No schemalocations is associated to root element the URI " + namespaceURI + "stay unchanged");
                 }
             }
             
@@ -314,17 +327,32 @@ public final class XSD11Validator {
             root.close();
             
             //4. Resolve namespaceURI against catalog Public, System, Relative to XMLInput
+            LOGGER.trace(MARKER, "Resolve URI " + namespaceURI + " against catalog Public, System, Relative to XMLInput");
+            
             String resolvedId = catalogResolver.resolvePublic(namespaceURI, null);
             if (resolvedId == null) {
+                LOGGER.trace(MARKER, "Failed Resolving of URI " + namespaceURI + " against Public catalog");
+                
                 resolvedId = catalogResolver.resolveSystem(namespaceURI);
                 if (resolvedId == null) {
-                    resolvedId = resolveRelativePath(xmlInput, resolvedId);
+                    LOGGER.trace(MARKER, "Failed Resolving of URI " + namespaceURI + " against System catalog");
+                    
+                    resolvedId = resolveRelativePath(xmlInputStreamSource.getSystemId(), namespaceURI);
                     if (resolvedId == null) {
+                        LOGGER.trace(MARKER, "Failed Resolving of URI " + namespaceURI + " relative to XMLInput");
                         resolvedId = namespaceURI;
+                    } else {
+                        LOGGER.trace(MARKER, "Successful Resolving of URI " + namespaceURI + " relative to XMLInput as " + resolvedId);                
                     }
+                } else {
+                    LOGGER.trace(MARKER, "Successful Resolving of URI " + namespaceURI + " against System catalog as " + resolvedId);                
                 }
+            } else {
+                LOGGER.trace(MARKER, "Successful Resolving of URI " + namespaceURI + " against Public catalog as " + resolvedId);                
             }
-            return new URL(namespaceURI);
+            return getURL(resolvedId);
+        } catch ( ApplicationHandler a) {
+            throw a;
         } catch ( Exception e) {
             throw new ApplicationHandler(e);
         }
@@ -349,6 +377,8 @@ public final class XSD11Validator {
                 URL url = getURL(xmlInput);
                 // create the stream
                 return new StreamSource(url.toString());
+            } catch ( ApplicationHandler a) {
+                throw a;
             } catch (Exception e) {
                 throw new ApplicationHandler(e);
             } 
@@ -396,6 +426,8 @@ public final class XSD11Validator {
             LOGGER.trace(MARKER, "XML Catalog Root Dir: " + xmlCatalogRootDir);
             
             return xmlCatalogRootDir;
+        } catch ( ApplicationHandler a) {
+            throw a;
         } catch (Exception e) {
             throw new ApplicationHandler(e);
         }
@@ -438,11 +470,85 @@ public final class XSD11Validator {
             }  else {
                 throw new ApplicationHandler("XML input is not a XML content");
             }
+        } catch ( ApplicationHandler a) {
+            throw a;
         } catch (Exception e) {
             throw new ApplicationHandler(e);
         }
     }
+
+
     
+    /** Resolve the relative Path using the base path
+     * 
+     * @param basePathOrURL The base path of the file or of the URL
+     * @param relativePath The relative path of the file or of the URL
+     * @return The resolved path
+     */
+    public static String resolveRelativePath(String basePathOrURL, String relativePath) 
+            throws ApplicationHandler {
+        
+        File file = new File(relativePath);
+        if (file.isAbsolute()) {
+            return getURL(relativePath).toString();
+        } else {
+            if ( basePathOrURL.startsWith("http:") || basePathOrURL.startsWith("https:") || basePathOrURL.startsWith("file:") ) {
+                basePathOrURL = basePathOrURL.substring(0, basePathOrURL.lastIndexOf("/") + 1);
+                
+                URI baseURI;
+                try {
+                    baseURI = new URI(basePathOrURL);
+                } catch (URISyntaxException e) {
+                    throw new IllegalArgumentException("Invalid base URL: " + basePathOrURL);
+                }
+        
+                URI resolvedURI;
+                try {
+                    resolvedURI = baseURI.resolve(relativePath);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("Invalid relative URL path: " + relativePath);
+                }
+        
+                return resolvedURI.toString();
+            } else {
+                basePathOrURL = new File(basePathOrURL).getAbsolutePath();
+
+                File resolved = new File(basePathOrURL, relativePath);
+                return resolved.getAbsolutePath();
+            }            
+        }
+
+    }
+
+        
+    /** Get the base path of a File or of an URL
+     * 
+     * @param filePathOrURL Filename or URL to extract the path
+     * @return The path
+     * @throws ApplicationHandler The generated error
+     */
+    public static String getBasePath(String filePathOrURL)
+            throws ApplicationHandler {
+        if (filePathOrURL.startsWith("http:") || filePathOrURL.startsWith("https:") || filePathOrURL.startsWith("file:")) {
+            // Extract the base path from a URL
+            URI uri;
+            try {
+                uri = new URI(filePathOrURL);
+            } catch (URISyntaxException e) {
+                throw new ApplicationHandler("Invalid URL: " + filePathOrURL);
+            }
+            return uri.getScheme() + "://" + uri.getHost() + "/" + uri.getPath().substring(0, uri.getPath().lastIndexOf("/") + 1);
+        } else {            
+            // Extract the base path from a file path
+            try {
+                File file = new File(filePathOrURL);
+                return file.getCanonicalPath() + "/";
+            } catch (Exception e) {
+                throw new ApplicationHandler("Invalid URL: " + filePathOrURL);
+            }
+        } 
+    }
+
     
     /** Get Url from system or URL resource.
      * 
@@ -459,16 +565,16 @@ public final class XSD11Validator {
         // if any filePathOrURL is provided
         if (filePathOrURL != null) {
             try {
-                if (filePathOrURL.startsWith("http")) {
+                if (filePathOrURL.startsWith("http:") || filePathOrURL.startsWith("https:") || filePathOrURL.startsWith("file:")) {
                     // Extract the path as a URL
                     return new URL(filePathOrURL);
                 } else {
                     // try to use input as a local file
     
-                        // Create Stream source using filename
-                        File file = new File(filePathOrURL);
-                        String filename = file.getParentFile().toURI().toURL() + "/" + file.getName();
-                        return new URI(filename).toURL();
+                    // Create Stream source using filename
+                    File file = new File(filePathOrURL);
+                    URL fileURL = file.getCanonicalFile().toURI().toURL();
+                    return fileURL;
                 }
             } catch (Exception e) {
                 throw new ApplicationHandler(e);
@@ -477,71 +583,7 @@ public final class XSD11Validator {
             throw new ApplicationHandler("No input to be coverted to URL");
         }
     }
-    
-    /** Get the base path of a File or of an URL
-     * 
-     * @param filePathOrURL Filename or URL to extract the path
-     * @return The path
-     * @throws ApplicationHandler The generated error
-     */
-    public static String getBasePath(String filePathOrURL)
-            throws ApplicationHandler {
-        if (filePathOrURL.startsWith("http")) {
-            // Extract the base path from a URL
-            URI uri;
-            try {
-                uri = new URI(filePathOrURL);
-            } catch (URISyntaxException e) {
-                throw new ApplicationHandler("Invalid URL: " + filePathOrURL);
-            }
-            return uri.getScheme() + "://" + uri.getHost() + "/";
-        } else {            
-            // Extract the base path from a file path
-            try {
-                File file = new File(filePathOrURL);
-                return file.getCanonicalPath() + "/";
-            } catch (Exception e) {
-                throw new ApplicationHandler("Invalid URL: " + filePathOrURL);
-            }
-        } 
-    }
-    
-    /** Resolve the relative Path using the base path
-     * 
-     * @param basePathOrURL The base path of the file or of the URL
-     * @param relativePath The relative path of the file or of the URL
-     * @return The resolved path
-     */
-    public static String resolveRelativePath(String basePathOrURL, String relativePath) {
-        if (basePathOrURL.startsWith("http")) {
-            if (!relativePath.startsWith("/")) {
-                basePathOrURL = basePathOrURL.substring(0, basePathOrURL.lastIndexOf("/") + 1);
-            }
-    
-            URI baseURI;
-            try {
-                baseURI = new URI(basePathOrURL);
-            } catch (URISyntaxException e) {
-                throw new IllegalArgumentException("Invalid base URL: " + basePathOrURL);
-            }
-    
-            URI resolvedURI;
-            try {
-                resolvedURI = baseURI.resolve(relativePath);
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Invalid relative URL path: " + relativePath);
-            }
-    
-            return resolvedURI.toString();
-        } else {
-            if (!relativePath.startsWith("/")) {
-                basePathOrURL = new File(basePathOrURL).getAbsolutePath();
-            }
-    
-            File resolved = new File(basePathOrURL, relativePath);
-            return resolved.getAbsolutePath();
-        } 
-    }
+
     
     /** Resolve namespaceURI in the schemaLocations.
      * 

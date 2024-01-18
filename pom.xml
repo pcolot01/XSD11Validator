@@ -6,12 +6,12 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
+<!--    <parent>
         <groupId>lu.infeurope</groupId>
         <artifactId>QualityControlReports</artifactId>
         <version>1.3</version>
     	<relativePath>../QualityControlReports/</relativePath>
-    </parent>
+    </parent>-->
 	
 	<groupId>eu.europa.publications.ifc.cov</groupId>
 	<artifactId>XSD11Validator</artifactId>
@@ -22,6 +22,7 @@
 
 	<properties>
 
+		<log4j.version>2.22.1</log4j.version>
 		<commons-cli.version>1.6.0</commons-cli.version>
 		<java-cup.version>10k</java-cup.version>
 		<junit-jupiter-api.version>5.10.1</junit-jupiter-api.version>
