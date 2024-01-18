@@ -139,7 +139,7 @@ public final class XSD11Validator {
                     throws ApplicationHandler, SAXNotRecognizedException, SAXNotSupportedException {
 
         // 1. Get the Validator
-        LOGGER.trace(MARKER, "Get Validator on XML Stream" + xmlInputStreamSource.getPublicId());
+        LOGGER.trace(MARKER, "Get Validator on XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId());
         if (xsdInput != null) { LOGGER.trace(MARKER, "  using external xsd: " + xsdInput); }
         if (catalogFileName != null) { LOGGER.trace(MARKER, "  and catalog: " + catalogFileName); }
 
@@ -178,7 +178,7 @@ public final class XSD11Validator {
             SAXNotRecognizedException, SAXNotSupportedException {
         
         // 1. Get the Validator
-        LOGGER.trace(MARKER, "Get Schema on XML Stream" + xmlInputStreamSource.getPublicId());
+        LOGGER.trace(MARKER, "Get Schema on XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId());
         if (xsdInput != null) { LOGGER.trace(MARKER, "  using external xsd: " + xsdInput); }
         LOGGER.trace(MARKER, "  and catalog: " + catalogResolver);
         
@@ -222,7 +222,7 @@ public final class XSD11Validator {
             SAXNotRecognizedException, SAXNotSupportedException {
         
         // 1. Extract Xsd UrL
-        LOGGER.trace(MARKER, "Get Xsd URL from XML Stream" + xmlInputStreamSource.getPublicId());
+        LOGGER.trace(MARKER, "Get Xsd URL from XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId());
         if (xsdInput != null) { LOGGER.trace(MARKER, "  using external xsd: " + xsdInput); }
         LOGGER.trace(MARKER, "  and catalog: " + catalogResolver);
 
@@ -274,7 +274,7 @@ public final class XSD11Validator {
             String xmlInput = xmlInputStreamSource.getPublicId();
             
             // 1. Extract Xsd UrL
-            LOGGER.trace(MARKER, "Get internal Xsd URL from XML Stream" + xmlInput);
+            LOGGER.trace(MARKER, "Get internal Xsd URL from XML Stream " + xmlInput);
             LOGGER.trace(MARKER, "  and catalog: " + catalogResolver);
             
             //2. Get the XML root qualified namespace [TODO add DTD alternative]
@@ -406,14 +406,12 @@ public final class XSD11Validator {
      * @param xmlInputStreamSource
      * @return
      * @throws ApplicationHandler
-     * @throws SAXNotRecognizedException
-     * @throws SAXNotSupportedException
      */
     private static XMLStreamReader getRoot(
             StreamSource xmlInputStreamSource) throws ApplicationHandler {
         try {
             // 1. Extract Qualified Name from root element
-            LOGGER.trace(MARKER, "Get the namespace from XML Stream" + xmlInputStreamSource.getPublicId());
+            LOGGER.trace(MARKER, "Get the namespace from XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId());
             
             // 2. Create factory to handle XML input
             XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
@@ -448,8 +446,8 @@ public final class XSD11Validator {
     
     /** Get Url from system or URL resource.
      * 
-     * @param input
-     * @return
+     * @param filePathOrURL Filename or URL to extract the URL
+     * @return The URL
      * @throws ApplicationHandler
      */
     private static URL getURL(final String filePathOrURL)
@@ -469,7 +467,7 @@ public final class XSD11Validator {
     
                         // Create Stream source using filename
                         File file = new File(filePathOrURL);
-                        String filename = file.getCanonicalPath() + "/" + file.getName();
+                        String filename = file.getParentFile().toURI().toURL() + "/" + file.getName();
                         return new URI(filename).toURL();
                 }
             } catch (Exception e) {
@@ -480,10 +478,11 @@ public final class XSD11Validator {
         }
     }
     
-    /**
+    /** Get the base path of a File or of an URL
      * 
-     * @param filePathOrURL
-     * @return
+     * @param filePathOrURL Filename or URL to extract the path
+     * @return The path
+     * @throws ApplicationHandler The generated error
      */
     public static String getBasePath(String filePathOrURL)
             throws ApplicationHandler {
@@ -507,6 +506,12 @@ public final class XSD11Validator {
         } 
     }
     
+    /** Resolve the relative Path using the base path
+     * 
+     * @param basePathOrURL The base path of the file or of the URL
+     * @param relativePath The relative path of the file or of the URL
+     * @return The resolved path
+     */
     public static String resolveRelativePath(String basePathOrURL, String relativePath) {
         if (basePathOrURL.startsWith("http")) {
             if (!relativePath.startsWith("/")) {
@@ -540,9 +545,9 @@ public final class XSD11Validator {
     
     /** Resolve namespaceURI in the schemaLocations.
      * 
-     * @param schemaLocations
-     * @param namespaceURI
-     * @return
+     * @param schemaLocations The schema locations
+     * @param namespaceURI The namespace to be resolved
+     * @return The resolved namespaceURI
      */
     public static String resolveLocation(final String schemaLocations, final String namespaceURI) {
         String res = "";
