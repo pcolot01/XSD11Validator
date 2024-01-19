@@ -96,17 +96,10 @@ public final class XSD11Validator {
             
             // 3. Validate the Stream source
             validator.validate(xmlInputStreamSource);
-            if (ApplicationHandler.getErrorCount() > 0) {
-                LOGGER.trace(MARKER, "Validate ended with " + ApplicationHandler.getErrorCount() + " error(s)");
-            } else {
-                LOGGER.trace(MARKER, "Validate ended without errors");
-            }
+            LOGGER.trace(MARKER, "Validate ended without errors");
         
         // 5. Alternate flows
         } catch (SAXException e) {
-            LOGGER.error(MARKER, "XML document is invalid with "
-                    + ApplicationHandler.getErrorCount() + " error(s).");
-        } catch (IOException e) {
             LOGGER.error(MARKER, "XML document is invalid with "
                     + ApplicationHandler.getErrorCount() + " error(s).");
         } catch (Exception e) {
@@ -409,29 +402,6 @@ public final class XSD11Validator {
         return catalogResolver;
     }
     
-    /** Check catalog exist and get the parent directory of the catalog.
-     * 
-     * @param catalogFileName
-     * @return
-     * @throws ApplicationHandler
-     */
-    private static String getXMLCatalogRootDir(final String catalogFileName) 
-            throws ApplicationHandler {
-        
-        // 1. Extract Xsd UrL Or Null
-        LOGGER.trace(MARKER, "Get XML Catalog Root Dir from " + catalogFileName);
-        
-        try {
-            String xmlCatalogRootDir = getBasePath(catalogFileName);
-            LOGGER.trace(MARKER, "XML Catalog Root Dir: " + xmlCatalogRootDir);
-            
-            return xmlCatalogRootDir;
-        } catch ( ApplicationHandler a) {
-            throw a;
-        } catch (Exception e) {
-            throw new ApplicationHandler(e);
-        }
-    }
     
     /** Get Root Qualified Name.
      * 
@@ -567,7 +537,7 @@ public final class XSD11Validator {
             try {
                 if (filePathOrURL.startsWith("http:") || filePathOrURL.startsWith("https:") || filePathOrURL.startsWith("file:")) {
                     // Extract the path as a URL
-                    return new URL(filePathOrURL);
+                    return new URI(filePathOrURL).toURL();
                 } else {
                     // try to use input as a local file
     
@@ -618,9 +588,8 @@ public final class XSD11Validator {
 //@TODO Add DTD public identifier tests in Test Suite 
 //@TODO Add noNamespaceSchemaLocation tests in Test Suite
 //@TODO Add http ref test
-//@TODO use AKN independant example
-//@TODO put on git
-//@TODO package as independent tool (broken in maven)
+//@TODO use XSD1.1 test suite example
+
 
 
 ////DTD
