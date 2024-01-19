@@ -86,7 +86,7 @@ public class ApplicationHandler extends Exception {
      * @param message The provided message
      * @param cause The provided exception cause
      * @param enableSuppression The provided flag
-     * @param writableStackTrace The provided writeable stack trace
+     * @param writableStackTrace The provided writeable stack trace flag
      */
     public ApplicationHandler(final String message, final Throwable cause,
             final boolean enableSuppression, final boolean writableStackTrace) {
