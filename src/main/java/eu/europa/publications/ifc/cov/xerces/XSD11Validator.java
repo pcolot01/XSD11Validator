@@ -249,7 +249,7 @@ public final class XSD11Validator {
     }
     
     
-    /** Get internal Xsd URL.
+    /** Get the schema URL defined inside the XML instance.
      * 
      * @param xsdInput
      * @param xmlInputStreamSource
@@ -583,12 +583,22 @@ public final class XSD11Validator {
 
 }
 
+
+//@TODO Remove eu / cov reference from code package
+//@TODO Anonymize tests
+//@TODO Refactorize to check schema
+//@TODO Refactorize to support DTD
+//@TODO Refactorize to reduce God Class (split in classes)
+//@TODO Add table of combinatory tests
 //@TODO Manage referred catalog in sub-directory
 //@TODO Add DTD system identifier tests in Test Suite 
 //@TODO Add DTD public identifier tests in Test Suite 
 //@TODO Add noNamespaceSchemaLocation tests in Test Suite
+//@TODO Add namespaceSchemaLocation test without used NS in Test Suite
+//@TODO Add test with absolute references for xml input, xml schema, xml catalog
+//@TODO Add test with absolute references in catalog for xml schema, xml catalog
+//@TODO Add use XSD1.1 test suite example
 //@TODO Add http ref test
-//@TODO use XSD1.1 test suite example
 
 
 
