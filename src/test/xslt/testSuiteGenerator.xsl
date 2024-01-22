@@ -13,50 +13,53 @@
     <xsl:output indent="no" encoding="UTF-8" method="text"/>
     
     <xsl:param name="generationDirectory" select="'file:/C:/Users/Home/Documents/GitHub/XSD11Validator/src/test/generated/'"/>
-    <xsl:param name="relativePath" select="''"/>
+    <xsl:param name="relativePath" select="replace(local:basePath(base-uri()), '^.*/testSuites/', '')"/>
     <xsl:param name="modulePath" select="'eu/europa/publications/xml/'"/>
     <xsl:param name="moduleName" select="'eu.europa.publications.xml'"/>
     <xsl:param name="filename" select="local:filename(base-uri())"/>
     
+    <xsl:variable name="dataDir" select="'./src/test/resources/eu/europa/publications/xml/testSuites/'"/>
+
     <xsl:template match="/">
         <xsl:param name="generationDirectory" select="$generationDirectory"/>
-        <xsl:param name="relativePath" select="$modulePath"/>
-        <xsl:param name="modulePath" select="$modulePath"/>
-        <xsl:param name="moduleName" select="$moduleName"/>
-        <xsl:param name="filename" select="$filename"/>
-        
-        Scan document: <xsl:value-of select="base-uri()"/>
-           generationDirectory: <xsl:value-of select="$generationDirectory"/>
-           relativePath: <xsl:value-of select="$relativePath"/>
-           modulePath: <xsl:value-of select="$modulePath"/>
-           moduleName: <xsl:value-of select="$moduleName"/>
-           fileName: <xsl:value-of select="$filename"/>
-        
-        Generate package-info.java: 
-<!--        <xsl:call-template name="local:generateFile_package-info.java">
-            <xsl:with-param name="generationDirectory" select="$generationDirectory"/>
-            <xsl:with-param name="modulePath" select="$modulePath"/>
-            <xsl:with-param name="moduleName" select="$moduleName"/>
-            <xsl:with-param name="filename" select="$filename"/>
-        </xsl:call-template>-->
- 
-        <xsl:apply-templates>
-            <xsl:with-param name="generationDirectory" select="$generationDirectory"/>
-            <xsl:with-param name="relativePath" select="$relativePath"/>
-            <xsl:with-param name="modulePath" select="$modulePath"/>
-            <xsl:with-param name="moduleName" select="$moduleName"/>
-            <xsl:with-param name="filename" select="$filename"/>
-        </xsl:apply-templates>
+        <xsl:param name="relativePath" select="$relativePath" as="xs:string"/>
+        <xsl:param name="modulePath" select="$modulePath" as="xs:string"/>
+        <xsl:param name="moduleName" select="$moduleName" as="xs:string"/>
+        <xsl:param name="filename" select="$filename" as="xs:string?"/>
+        <DBG>
+	        Scan document: <xsl:value-of select="base-uri()"/>
+	           generationDirectory: <xsl:value-of select="$generationDirectory"/>
+	           relativePath: <xsl:value-of select="$relativePath"/>
+	           modulePath: <xsl:value-of select="$modulePath"/>
+	           moduleName: <xsl:value-of select="$moduleName"/>
+	           fileName: <xsl:value-of select="$filename"/>
+	        
+	        Generate package-info.java: 
+	<!--        <xsl:call-template name="local:generateFile_package-info.java">
+	            <xsl:with-param name="generationDirectory" select="$generationDirectory"/>
+	            <xsl:with-param name="modulePath" select="$modulePath"/>
+	            <xsl:with-param name="moduleName" select="$moduleName"/>
+	            <xsl:with-param name="filename" select="$filename"/>
+	        </xsl:call-template>-->
+	 
+	        <xsl:apply-templates>
+	            <xsl:with-param name="generationDirectory" select="$generationDirectory"/>
+	            <xsl:with-param name="relativePath" select="$relativePath"/>
+	            <xsl:with-param name="modulePath" select="$modulePath"/>
+	            <xsl:with-param name="moduleName" select="$moduleName"/>
+	            <xsl:with-param name="filename" select="$filename"/>
+	        </xsl:apply-templates>
+        </DBG>
     </xsl:template>
     
     <xsl:template match="text()"/>
     
     <xsl:template match="ts:testSuite">
-        <xsl:param name="generationDirectory"/>
-        <xsl:param name="relativePath"/>
-        <xsl:param name="modulePath"/>
-        <xsl:param name="moduleName"/>
-        <xsl:param name="filename"/>
+        <xsl:param name="generationDirectory" as="xs:string"/>
+        <xsl:param name="relativePath" as="xs:string"/>
+        <xsl:param name="modulePath" as="xs:string"/>
+        <xsl:param name="moduleName" as="xs:string"/>
+        <xsl:param name="filename" as="xs:string?"/>
         
         <xsl:apply-templates>
             <xsl:with-param name="generationDirectory" select="$generationDirectory"/>
@@ -68,11 +71,11 @@
     </xsl:template>
 
     <xsl:template match="ts:testSetRef[@xlink:href]">
-        <xsl:param name="generationDirectory"/>
-        <xsl:param name="relativePath"/>
-        <xsl:param name="modulePath"/>
-        <xsl:param name="moduleName"/>
-        <xsl:param name="filename"/>
+        <xsl:param name="generationDirectory" as="xs:string"/>
+        <xsl:param name="relativePath" as="xs:string"/>
+        <xsl:param name="modulePath" as="xs:string"/>
+        <xsl:param name="moduleName" as="xs:string"/>
+        <xsl:param name="filename" as="xs:string?"/>
         
         <xsl:variable name="basePath" select="local:basePath(@xlink:href)"/>
         <xsl:variable name="filename" select="local:filename(@xlink:href)"/>
@@ -89,14 +92,15 @@
     </xsl:template>
 
     <xsl:template match="ts:testSet">
-        <xsl:param name="generationDirectory"/>
-        <xsl:param name="relativePath"/>
-        <xsl:param name="modulePath"/>
-        <xsl:param name="moduleName"/>
-        <xsl:param name="filename"/>
+        <xsl:param name="generationDirectory" as="xs:string"/>
+        <xsl:param name="relativePath" as="xs:string"/>
+        <xsl:param name="modulePath" as="xs:string"/>
+        <xsl:param name="moduleName" as="xs:string"/>
+        <xsl:param name="filename" as="xs:string?"/>
 
         <xsl:call-template name="local:generateFile_xxxTests.java">
             <xsl:with-param name="generationDirectory" select="$generationDirectory"/>
+            <xsl:with-param name="relativePath" select="$relativePath"/>
             <xsl:with-param name="modulePath" select="$modulePath"/>
             <xsl:with-param name="moduleName" select="$moduleName"/>
             <xsl:with-param name="filename" select="$filename"/>
@@ -131,11 +135,13 @@ package </xsl:text><xsl:value-of select="$moduleName"/><xsl:text>;</xsl:text>
 
     <xsl:template name="local:generateFile_xxxTests.java">
         <xsl:param name="generationDirectory" as="xs:string"/>
+        <xsl:param name="relativePath" as="xs:string"/>
         <xsl:param name="modulePath" as="xs:string"/>
         <xsl:param name="moduleName" as="xs:string"/>
-        <xsl:param name="filename" as="xs:string"/>
+        <xsl:param name="filename" as="xs:string?"/>
         
         <xsl:result-document indent="no" encoding="UTF-8" method="text" href="{concat($generationDirectory, $modulePath, @name, 'Tests.java')}">
+			
             <xsl:text>package </xsl:text><xsl:value-of select="$moduleName"/><xsl:text>;
 
 import org.junit.jupiter.api.Test;
@@ -146,6 +152,9 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
+import eu.europa.publications.xml.tools.ApplicationHandler;
+import eu.europa.publications.xml.tools.XSD11Validator;
+
 /**
  * </xsl:text><xsl:value-of select="@description"/><xsl:text>.
  *
@@ -153,7 +162,7 @@ import org.apache.logging.log4j.MarkerManager;
  * @author pcolot
  * @version 1.0
  */
-class </xsl:text><xsl:value-of select="concat(@name, 'Tests')"/><xsl:text> {
+class </xsl:text><xsl:value-of select="replace(concat(@name, 'Tests'), '-|\.', '_')"/><xsl:text> {
 
     /** The name of this Logger will be "</xsl:text><xsl:value-of select="concat($moduleName, '.', @name, 'Tests')"/><xsl:text>".
      */
@@ -162,7 +171,7 @@ class </xsl:text><xsl:value-of select="concat(@name, 'Tests')"/><xsl:text> {
     
     /** Root directory for all test resources
      */
-    final String dataDir = "./";
+    final String dataDir = "</xsl:text><xsl:value-of select="$dataDir"/><xsl:text>";
 
     /** Setup executed before each test.
      * 
@@ -175,6 +184,7 @@ class </xsl:text><xsl:value-of select="concat(@name, 'Tests')"/><xsl:text> {
 </xsl:text> 
         <xsl:apply-templates>
             <xsl:with-param name="generationDirectory" select="$generationDirectory"/>
+            <xsl:with-param name="relativePath" select="$relativePath"/>
             <xsl:with-param name="modulePath" select="$modulePath"/>
             <xsl:with-param name="moduleName" select="$moduleName"/>
             <xsl:with-param name="filename" select="$filename"/>
@@ -188,6 +198,7 @@ class </xsl:text><xsl:value-of select="concat(@name, 'Tests')"/><xsl:text> {
 
     <xsl:template match="ts:testGroup">
         <xsl:param name="generationDirectory" as="xs:string"/>
+        <xsl:param name="relativePath" as="xs:string"/>
         <xsl:param name="modulePath" as="xs:string"/>
         <xsl:param name="moduleName" as="xs:string"/>
         <xsl:param name="filename" as="xs:string"/>
@@ -199,6 +210,7 @@ class </xsl:text><xsl:value-of select="concat(@name, 'Tests')"/><xsl:text> {
         
         <xsl:apply-templates select="ts:instanceTest">
             <xsl:with-param name="generationDirectory" select="$generationDirectory"/>
+            <xsl:with-param name="relativePath" select="$relativePath"/>            
             <xsl:with-param name="modulePath" select="$modulePath"/>
             <xsl:with-param name="moduleName" select="$moduleName"/>
             <xsl:with-param name="filename" select="$filename"/>
@@ -211,6 +223,7 @@ class </xsl:text><xsl:value-of select="concat(@name, 'Tests')"/><xsl:text> {
 
     <xsl:template match="ts:instanceTest">
         <xsl:param name="generationDirectory" as="xs:string"/>
+        <xsl:param name="relativePath" as="xs:string"/>
         <xsl:param name="modulePath" as="xs:string"/>
         <xsl:param name="moduleName" as="xs:string"/>
         <xsl:param name="filename" as="xs:string?"/>
@@ -222,18 +235,17 @@ class </xsl:text><xsl:value-of select="concat(@name, 'Tests')"/><xsl:text> {
      * 
      */
     @Test
-	void </xsl:text><xsl:value-of select="$testName"/><xsl:text>()
+	void </xsl:text><xsl:value-of select="replace(concat($testName, '__', @name), '-|\.', '_')"/><xsl:text>()
 	{
-	    int expectedValue, returnValue;
 	    final String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
 
 		XSD11Validator xsd11Validator = new XSD11Validator();
-		returnValue = xsd11Validator.validateFile(</xsl:text><xsl:value-of select="local:stringOrNull(ts:instanceDocument/@xlink:href)"/><xsl:text>, </xsl:text><xsl:value-of select="local:stringOrNull($schema)"/><xsl:text>, </xsl:text><xsl:value-of select="local:stringOrNull($catalog)"/><xsl:text>);
+		int returnValue = xsd11Validator.validateFile(</xsl:text><xsl:value-of select="local:stringOrNull($relativePath, ts:instanceDocument/@xlink:href)"/><xsl:text>, </xsl:text><xsl:value-of select="local:stringOrNull($relativePath, $schema)"/><xsl:text>, </xsl:text><xsl:value-of select="local:stringOrNull($relativePath, $catalog)"/><xsl:text>);
 </xsl:text>
             <xsl:choose>
                 <xsl:when test="not(empty(ts:expected/@withCode))">
                     <xsl:text>
-		expectedValue = </xsl:text><xsl:value-of select="ts:expected/@withCode"/><xsl:text>;
+		int expectedValue = </xsl:text><xsl:value-of select="ts:expected/@withCode"/><xsl:text>;
 		boolean hasCode = (returnValue == expectedValue);
 		if (hasCode) logger.info(marker, "Test: " + methodName + " returned: " + returnValue + " As expected");
 		else logger.error(marker, "Test: " + methodName + " returned unexpected value: " + returnValue + " in place of expected value: " + expectedValue) ;
@@ -296,14 +308,21 @@ class </xsl:text><xsl:value-of select="concat(@name, 'Tests')"/><xsl:text> {
     </xsl:function>
 
     <xsl:function name="local:stringOrNull">
+		<xsl:param name="relativePath" as="xs:string"/>
         <xsl:param name="path" as="xs:string?"/>
 
         <xsl:choose>
             <xsl:when test="empty($path) or ($path eq 'null()')">
                 <xsl:text>null</xsl:text>
             </xsl:when>
+            <xsl:when test="matches($path,'^\./')">
+                <xsl:text>"</xsl:text><xsl:value-of select="concat($dataDir, $relativePath, replace($path, '^\./', ''))"/><xsl:text>"</xsl:text>
+            </xsl:when>
+            <xsl:when test="matches($path,'^\.\./')">
+                <xsl:text>"</xsl:text><xsl:value-of select="concat($dataDir, local:basePath(replace($relativePath, '/$', '')), replace($path, '^\.\./', ''))"/><xsl:text>"</xsl:text>
+            </xsl:when>
             <xsl:otherwise>
-                <xsl:text>'</xsl:text><xsl:value-of select="$path"/><xsl:text>'</xsl:text>
+                <xsl:text>"</xsl:text><xsl:value-of select="concat($dataDir, $relativePath, $path)"/><xsl:text>"</xsl:text>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>    

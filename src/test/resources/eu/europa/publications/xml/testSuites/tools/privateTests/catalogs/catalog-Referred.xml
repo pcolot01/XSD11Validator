@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+<!--    <system systemId="../../../ifc/cov/xerces/xerces-test.xsd" uri="file:/D:/OP/_DEV/XSD11Validator/src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd"/>
+    <public publicId="http://ifc.europa.eu/common_vocabulary" uri="file:/D:/OP/_DEV/XSD11Validator/src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd"/>-->
+    
+    <system systemId="../../../ifc/cov/xerces/xerces-test.xsd" uri="file:/C:/Users/Home/Documents/GitHub/XSD11Validator/src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd"/>
+    <public publicId="http://ifc.europa.eu/common_vocabulary" uri="file:/C:/Users/Home/Documents/GitHub/XSD11Validator/src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd"/>
+</catalog>

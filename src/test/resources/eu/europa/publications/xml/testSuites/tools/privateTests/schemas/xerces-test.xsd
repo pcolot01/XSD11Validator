@@ -1,0 +1,2967 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<xs:schema
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:ifc="http://ifc.europa.eu/common_vocabulary"
+	xmlns:cv="http://ifc.europa.eu/common_vocabulary/cov_xsd_doc_extensions"
+	xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+	xmlns:fn="http://www.w3.org/2005/xpath-functions"
+	targetNamespace="http://ifc.europa.eu/common_vocabulary"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	version="1.1"
+	vc:minVersion="1.1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	>
+
+	<!--
+	TODO assertions for:
+	- For example in this xml it should report that subparagraphs need to be added:
+	  <point>
+			<numbering>4.6.</numbering> <subject>Reporting</subject>
+			<introductory_part>The notified body shall:</introductory_part>
+			<indent>— ensure that all steps of the conformity assessment are documented so that the conclusions of the assessment are clear and demonstrate compliance with the requirements of this Regulation and can represent objective evidence of such compliance to persons that are not themselves involved in the assessment, for example personnel in designating authorities,</indent>
+			<indent>— ensure that records that are sufficient to provide a discernible audit trail are available for quality management system audits,</indent>
+			<indent>— clearly document the conclusions of its assessment of performance evaluation in a performance evaluation assessment report,</indent>
+			<indent>— for each specific project, provide a detailed report which shall be based on a standard format containing a minimum set of elements determined by the MDCG.</indent>
+			<introductory_part>The report of the notified body shall:</introductory_part>
+			<indent>— clearly document the outcome of its assessment and draw clear conclusions from the verification of the manufacturer's conformity with the requirements of this Regulation,</indent>
+			<indent>— make a recommendation for a final review and for a final decision to be taken by the notified body; this recommendation shall be signed off by the member of personnel responsible in the notified body,</indent>
+			<indent>— be provided to the manufacturer in question.</indent>
+		</point>
+	- verify the consistency of the root element with the content of the type_of_document
+	- type_of_document: verify that it matches one of predefined strings
+	-->
+	<!--
+	#############################################################################
+	#
+	# Administrative information
+	#
+	#############################################################################
+	-->
+	<xs:annotation>
+		<xs:documentation>
+			<cv:title>IMFC — Common Vocabulary</cv:title>
+			<cv:version draft="true">2.1</cv:version>
+			<cv:date>2019-06-29</cv:date>
+
+			<cv:bibliography>
+				<cv:title>Normative documentation</cv:title>
+				<cv:bib_unit link="https://ec.europa.eu/info/sites/info/files/joint_handbook_en_lt.pdf">JH - Joint Handbook for the presentation and drafting of acts subject to the Ordinary Legislative Procedure</cv:bib_unit>
+				<cv:bib_unit link="http://eur-lex.europa.eu/content/techleg/KB0213228ENN.pdf">JPG - Joint Practical Guide for persons involved in the drafting of European Union legislation</cv:bib_unit>
+			</cv:bibliography>
+
+			<cv:bibliography>
+				<cv:title>Informative documentation</cv:title>
+				<cv:bib_unit link="http://publications.europa.eu/code/en/en-000100.htm">ISG - Interinstitutional Style Guide</cv:bib_unit>
+			</cv:bibliography>
+		</xs:documentation>
+	</xs:annotation>
+	<!--
+	####################################################################################################
+	#
+	# Type definitions
+	#
+	####################################################################################################
+	-->
+	<xs:complexType name="t_acting_entity" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence/>
+	</xs:complexType>
+
+	<xs:complexType name="t_annex" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:choice>
+			<!-- standard annex -->
+			<xs:sequence>
+				<xs:element ref="ifc:heading" minOccurs="0"/>
+				<xs:element ref="ifc:subject" minOccurs="0"/>
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element ref="ifc:title"/>
+					<xs:element ref="ifc:part"/>
+					<xs:element ref="ifc:chapter"/>
+					<xs:element ref="ifc:section"/>
+					<xs:element ref="ifc:table"/>
+					<xs:element ref="ifc:unnumbered_paragraph"/>
+					<xs:element ref="ifc:point"/>
+					<xs:element ref="ifc:indent"/>
+					<xs:element ref="ifc:introductory_part"/>
+					<xs:element ref="ifc:closing_part"/>
+					<xs:element ref="ifc:note"/>
+					<xs:element ref="ifc:quotation">
+						<xs:annotation>
+							<xs:documentation>
+								<cv:contains>
+									<cv:allow_empty/>
+								</cv:contains>
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+			</xs:sequence>
+		</xs:choice>
+		<!-- TODO provide the test -->
+		<xs:assert test="fn:true()">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>A subject of an annex</cv:title>
+						<cv:definition>If there is no subject in the annex and a single section with a subject so the subject has to be moved to the annex level.</cv:definition>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="not(.//ifc:*[local-name()=('unnumbered_paragraph','subparagraph') and (ifc:introductory_part|ifc:point|ifc:indent) and following-sibling::ifc:*[1][local-name()=('unnumbered_paragraph','subparagraph') and matches(fn:normalize-space(string-join(.//text(),'')),'^[a-z]')]])">
+			<xs:annotation>
+				<xs:documentation>
+					<!-- this rule is applicable within: t_annex, t_enacting_parts -->
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Avoid a closing part marked as an unnumbered paragraph or subparagraph</cv:title>
+						<cv:definition>If there is a paragraph, containing introductory_part+points/indents, followed by another paragraph, containing text in the first node, and this text starts with a small letter, so it should be a closing_part.</cv:definition>
+						<cv:example>
+							<cv:title>Wrong</cv:title>
+							<cv:code>&lt;unnumbered_paragraph&gt;<cv:br/>
+<cv:indent/>&lt;introductory_part&gt;Following:&lt;/introductory_part&gt;<cv:br/>
+<cv:indent/>&lt;point&gt;&lt;numbering&gt;(i)&lt;/numbering&gt; first point&lt;/point&gt;<cv:br/>
+<cv:indent/>&lt;point&gt;&lt;numbering&gt;(ii)&lt;/numbering&gt; second point&lt;/point&gt;<cv:br/>
+&lt;/unnumbered_paragraph&gt;<cv:br/>
+&lt;unnumbered_paragraph&gt;are important points.&lt;/unnumbered_paragraph&gt;</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Correct</cv:title>
+							<cv:code>&lt;unnumbered_paragraph&gt;<cv:br/>
+<cv:indent/>&lt;introductory_part&gt;Following:&lt;/introductory_part&gt;<cv:br/>
+<cv:indent/>&lt;point&gt;&lt;numbering&gt;(i)&lt;/numbering&gt; first point&lt;/point&gt;<cv:br/>
+<cv:indent/>&lt;point&gt;&lt;numbering&gt;(ii)&lt;/numbering&gt; second point&lt;/point&gt;<cv:br/>
+<cv:indent/>&lt;closing_part&gt;are important points.&lt;/closing_part&gt;<cv:br/>
+&lt;/unnumbered_paragraph&gt;</cv:code>
+						</cv:example>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+		<!-- TODO delete: we decided to use subparagraphs
+			TODO is there a rule that ensures the use of a subparagraph in the annex?
+		<xs:assert test="not(.//ifc:point[not(ancestor::ifc:article)]/ifc:subparagraph)">
+			<xs:annotation>
+				<xs:documentation>
+					Points inside of an annex, unless it is an annex with articles, use
+					an unnumbered_paragraph and not the subparagraph as in the enacting
+					terms points.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert> -->
+	</xs:complexType>
+	<xs:complexType name="t_annexes">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:logo"/>
+			<xs:element ref="ifc:place_and_date"/>
+			<xs:element ref="ifc:reference"/>
+			<xs:element ref="ifc:version" minOccurs="0"/>
+			<xs:element ref="ifc:heading"/>
+			<xs:element ref="ifc:subject"/>
+			<xs:element ref="ifc:annex" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_article" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:heading"/>
+			<xs:element ref="ifc:subject" minOccurs="0"/>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="ifc:numbered_paragraph"/>
+				<xs:element ref="ifc:unnumbered_paragraph"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_change_to_original_text" mixed="true">
+		<xs:sequence/>
+		<xs:attribute name="type" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>refonte_deletion/adapted/addition/deletion</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="severity" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>minor</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="t_chapter" mixed="true">
+		<xs:sequence>
+			<xs:element ref="ifc:heading"/>
+			<xs:element ref="ifc:subject"/>
+			<xs:element ref="ifc:article" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="ifc:section" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="ifc:point" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="ifc:indent" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_citation" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:indent" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="ifc:note"/>
+				<xs:element ref="ifc:legal_basis"/>
+				<xs:element ref="ifc:date"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_closing_part" mixed="true">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<!-- In general, the content of the closing_part should be the same as for the introductory_part  -->
+			<xs:element ref="ifc:date"/>
+			<xs:element ref="ifc:note"/>
+			<xs:element ref="ifc:quotation">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:allow_empty/>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ifc:scientific_formula">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:allow_empty/>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+		<xs:assert test="matches(fn:normalize-space(text()), '^[a-z]')">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Closing part starts with a lower-case</cv:title>
+						<cv:definition>The closing part has to start with a small letter because it is a continuation of a sentence started in the introductory part.</cv:definition>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+	<xs:complexType name="t_Commission_communication" mixed="true">
+		<xs:sequence>
+			<xs:element ref="ifc:procedure_identifier"/>
+			<xs:element ref="ifc:title_of_the_document" minOccurs="0"/>
+			<xs:element ref="ifc:section" maxOccurs="unbounded"/>
+			<xs:element ref="ifc:signature" minOccurs="0"/>
+			<xs:element ref="ifc:annex" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_Commission_opinion" mixed="true">
+		<xs:sequence>
+			<xs:element ref="ifc:procedure_identifier"/>
+			<xs:element ref="ifc:title_of_the_document" minOccurs="0"/>
+			<xs:element ref="ifc:section" maxOccurs="unbounded"/>
+			<xs:element ref="ifc:signature" minOccurs="0"/>
+			<xs:element ref="ifc:annex" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_communication" mixed="true">
+		<xs:sequence>
+			<xs:element ref="ifc:logo"/>
+			<xs:element ref="ifc:place_and_date"/>
+			<xs:element ref="ifc:reference"/>
+			<xs:element ref="ifc:version" minOccurs="0"/>
+			<xs:element ref="ifc:procedure_identifier"/>
+			<xs:element ref="ifc:title_of_the_document"/>
+			<xs:choice>
+				<xs:element ref="ifc:Commission_communication"/>
+			</xs:choice>
+		</xs:sequence>
+		<xs:assert test="not(.//ifc:point[not(ancestor::ifc:article)]/ifc:subparagraph)">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Markup of paragraphs in a context of an annex</cv:title>
+						<cv:definition>Points inside of an annex, unless it is an annex with articles, use an unnumbered paragraph and not the subparagraph as in the enacting terms points.</cv:definition>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+	<xs:complexType name="t_decision">
+		<xs:sequence>
+			<xs:element ref="ifc:procedure_identifier" minOccurs="0"/>
+			<!-- TODO: assertion Decision that is a part of the position does not need to have the title_of_the_document, otherwise it is mandatory -->
+			<xs:element ref="ifc:title_of_the_document" minOccurs="0"/>
+			<xs:element ref="ifc:EEA_relevance" minOccurs="0"/>
+			<xs:element ref="ifc:preamble"/>
+			<xs:element ref="ifc:enacting_terms"/>
+			<xs:element ref="ifc:signature"/>
+			<xs:element ref="ifc:annex" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_directive" mixed="true">
+		<xs:sequence>
+			<xs:element ref="ifc:procedure_identifier" minOccurs="0"/>
+			<xs:choice>
+				<xs:element ref="ifc:title_of_the_document"/>
+			</xs:choice>
+			<xs:element ref="ifc:EEA_relevance" minOccurs="0"/>
+			<xs:element ref="ifc:preamble"/>
+			<xs:element ref="ifc:enacting_terms"/>
+			<xs:element ref="ifc:signature"/>
+			<xs:element ref="ifc:annex" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_enacting_terms" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:choice>
+			<xs:element ref="ifc:article" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element ref="ifc:chapter" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element ref="ifc:numbered_paragraph" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element ref="ifc:part" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element ref="ifc:title" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:choice>
+		<xs:assert test="not(.//ifc:point/ifc:unnumbered_paragraph)">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Markup of paragraphs in a context of the enacting terms</cv:title>
+						<cv:definition>Points inside of the enacting terms use a subparagraph and not the unnumbered_paragraph as in the annex points.</cv:definition>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="not(.//ifc:*[local-name()=('unnumbered_paragraph','subparagraph') and (ifc:introductory_part|ifc:point|ifc:indent) and following-sibling::ifc:*[1][local-name()=('unnumbered_paragraph','subparagraph') and matches(fn:normalize-space(string-join(.//text(),'')),'^[a-z]')]])">
+			<xs:annotation>
+				<xs:documentation>
+					<!-- this rule is applicable within: t_annex, t_enacting_parts -->
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Avoid a closing part marked as an unnumbered paragraph or subparagraph</cv:title>
+						<cv:definition>If there is a paragraph, containing introductory_part+points/indents, followed by another paragraph, containing text in the first node, and this text starts with a small letter, so it should be a closing_part.</cv:definition>
+						<cv:example>
+							<cv:title>Wrong</cv:title>
+							<cv:code>&lt;unnumbered_paragraph&gt;
+	&lt;introductory_part&gt;Following:&lt;/introductory_part&gt;
+	&lt;point&gt;&lt;numbering&gt;(i)&lt;/numbering&gt; first point&lt;/point&gt;
+	&lt;point&gt;&lt;numbering&gt;(ii)&lt;/numbering&gt; second point&lt;/point&gt;
+&lt;/unnumbered_paragraph&gt;
+&lt;unnumbered_paragraph&gt;are important points.&lt;/unnumbered_paragraph&gt;</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Correct</cv:title>
+							<cv:code>&lt;unnumbered_paragraph&gt;
+	&lt;introductory_part&gt;Following:&lt;/introductory_part&gt;
+	&lt;point&gt;&lt;numbering&gt;(i)&lt;/numbering&gt; first point&lt;/point&gt;
+	&lt;point&gt;&lt;numbering&gt;(ii)&lt;/numbering&gt; second point&lt;/point&gt;
+	&lt;closing_part&gt;are important points.&lt;/closing_part&gt;
+&lt;/unnumbered_paragraph&gt;</cv:code>
+						</cv:example>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+	<xs:complexType name="t_explanatory_memorandum" mixed="true">
+		<xs:sequence>
+			<xs:element ref="ifc:subject" minOccurs="0"/>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="ifc:section"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_heading" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:numbering" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="ifc:note"/>
+			</xs:choice>
+		</xs:sequence>
+		<xs:assert test="not(text()) or text()[matches(fn:normalize-space(.),'^(annex|chapter|section|title|part|ad article|—|article|objective|sub\s*-?\s*section|subject:?)$','i')]">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Typical heading patterns</cv:title>
+						<cv:definition>If the heading specifies a text that does not match one of the specified strings so it should be rather a subject.</cv:definition>
+						<cv:example>
+							<cv:title>Avoid</cv:title>
+							<cv:code>&lt;heading&gt;&lt;numbering&gt;1.&lt;/numbering&gt; General information&lt;/heading&gt;</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Use instead</cv:title>
+							<cv:code>&lt;heading&gt;&lt;numbering&gt;1.&lt;/numbering&gt;&lt;/heading&gt; &lt;subject&gt;General information&lt;/subject&gt;</cv:code>
+						</cv:example>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+	<xs:complexType name="t_implementing_regulation">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:title_of_the_document"/>
+			<xs:element ref="ifc:EEA_relevance" minOccurs="0"/>
+			<xs:element ref="ifc:preamble"/>
+			<xs:element ref="ifc:enacting_terms"/>
+			<xs:element ref="ifc:direct_applicability"/>
+			<xs:element ref="ifc:signature"/>
+			<xs:element ref="ifc:annex" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_indent" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="ifc:date"/>
+			<xs:element ref="ifc:note"/>
+			<xs:element ref="ifc:quotation">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ifc:indent"/>
+			<xs:element ref="ifc:introductory_part"/>
+			<xs:element ref="ifc:closing_part"/>
+			<xs:element ref="ifc:scientific_formula"/>
+			<xs:element ref="ifc:subparagraph">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ifc:table">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+		<xs:attribute name="class"/>
+		<xs:assert test="text()[1][matches(fn:normalize-space(.),'^—')]">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Indent start character</cv:title>
+						<cv:definition>An indent has to start with a dash '—'.</cv:definition>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+	<xs:complexType name="t_international_agreement">
+		<xs:sequence>
+			<xs:element ref="ifc:procedure_identifier" minOccurs="0"/>
+			<xs:element ref="ifc:title_of_the_document"/>
+			<xs:element ref="ifc:EEA_relevance" minOccurs="0"/>
+			<xs:element ref="ifc:preamble"/>
+			<xs:element ref="ifc:enacting_terms"/>
+			<xs:element ref="ifc:signature"/>
+			<xs:element ref="ifc:annex" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_legislative_resolution" mixed="true">
+		<xs:sequence minOccurs="0">
+			<xs:element ref="ifc:title_of_the_document"/>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element ref="ifc:reference"/>
+			</xs:sequence>
+			<xs:element ref="ifc:procedure_identifier"/>
+			<xs:element ref="ifc:procedure_stage"/>
+			<xs:element ref="ifc:preamble"/>
+			<xs:element ref="ifc:enacting_terms"/>
+		</xs:sequence>
+		<xs:assert test=".//ifc:citation/text()[1][matches(fn:normalize-space(.),'^—')]">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:jira_validation>IFCCV-500</cv:jira_validation>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>proposed</cv:status>
+						<cv:title>Beginning of the citation in EP legislative resolution</cv:title>
+						<cv:definition>A citation in a legislative resolution starts with a dash.</cv:definition>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+	<xs:complexType name="t_introductory_part" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="ifc:date"/>
+			<xs:element ref="ifc:quotation"/>
+			<xs:element ref="ifc:note"/>
+			<xs:element ref="ifc:scientific_formula">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+		<xs:assert test="text()[last()][matches(fn:normalize-space(.),':$')]">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Last character of an introductory part</cv:title>
+						<cv:definition>An introductory part has to finish with a colon ':'.</cv:definition>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+	<xs:complexType name="t_logo" mixed="true">
+		<xs:choice minOccurs="2" maxOccurs="2">
+			<xs:element ref="ifc:emblem"/>
+			<xs:element ref="ifc:acting_entity"/>
+			<xs:element ref="ifc:proposing_entity"/>
+		</xs:choice>
+		<!-- TODO assertions? There should be exactly 1 element contained and 1 of the others-->
+	</xs:complexType>
+	<xs:complexType name="t_note" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="ifc:date"/>
+			<xs:element ref="ifc:quotation"/>
+			<xs:element ref="ifc:scientific_formula">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+		<xs:attribute name="name" type="xs:string">
+			<!-- annotation commented as a this moment is not properly processed (rather ignored) by the pdf generator
+			<xs:annotation>
+				<xs:documentation>If the note is reffered from more place so it needs to have a name specified.</xs:documentation>
+			</xs:annotation>
+			-->
+		</xs:attribute>
+		<xs:attribute name="ref" type="xs:string">
+			<!-- annotation commented as a this moment is not properly processed (rather ignored) by the pdf generator
+			<xs:annotation>
+				<xs:documentation>A note with ref is expected to have an empty body and the value of the ref has to be a name of another note in the document.</xs:documentation>
+			</xs:annotation>
+			-->
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="t_numbered_paragraph" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:numbering"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="ifc:subparagraph"/>
+				<xs:element ref="ifc:point"/>
+				<xs:element ref="ifc:indent"/>
+				<xs:element ref="ifc:note"/>
+				<xs:element ref="ifc:table"/>
+				<xs:element ref="ifc:scientific_formula"/>
+				<xs:element ref="ifc:date"/>
+				<xs:element ref="ifc:introductory_part"/>
+				<xs:element ref="ifc:closing_part"/>
+				<xs:element ref="ifc:quotation"/>
+				<xs:element ref="ifc:heading"/>
+				<xs:element ref="ifc:text_of_the_amendment"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_numbering" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence/>
+		<xs:assert test="matches(fn:normalize-space(.),'^(\d+(\.\d+)*\.?|\(\d+\)|\(?\w{1,2}\)|\([ivxlcdm]+\)|[IVXLCDM]+\.?|\d+\w(\.\d+\w)*\.?|ONE|TWO|THREE|FOUR|FIVE|SIX|SEVEN|EIGHT|NINE|TEN|ELEVEN|\w+\.?)$')">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Numbering format</cv:title>
+						<cv:definition>Numbering has to respect previewed formats.</cv:definition>
+						<cv:example>
+							<cv:title>Common numbering</cv:title>
+							<cv:code>"1", "1.", "5.2."<cv:br/>
+matched by: '\d+(\.\d+)*\.?'</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Numbering in parentheses</cv:title>
+							<cv:code>"(10)"<cv:br/>
+matched by: '\(\d+\)'</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Letter numbering in parentheses</cv:title>
+							<cv:code>"(a)", "a)", "(ca)"<cv:br/>
+matched by: '\(?\w{1,2}\)'</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Greek numbering in parenthesis</cv:title>
+							<cv:code>"(iii)"<cv:br/>
+matched by: '\([ivxlcdm]+\)'</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Greek numbering</cv:title>
+							<cv:code>"I", "I."<cv:br/>
+matched by: '[IVXLCDM]+\.?'</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Numbering with a letter</cv:title>
+							<cv:code>"3a.", "1a.2b"<cv:br/>
+matches: '\d+\w(\.\d+\w)*\.?'</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Numbering with a word</cv:title>
+							<cv:code>"ONE", "TWO"<cv:br/>
+								matches: 'ONE|TWO'</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Numbering with a capital letter</cv:title>
+							<cv:code>"A."<cv:br/>
+								matches: '\w+\.?'</cv:code>
+						</cv:example>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+	<xs:complexType name="t_opinion" mixed="true">
+		<xs:sequence>
+			<xs:element ref="ifc:logo"/>
+			<xs:element ref="ifc:place_and_date"/>
+			<xs:element ref="ifc:reference"/>
+			<xs:element ref="ifc:procedure_identifier"/>
+			<xs:choice minOccurs="0">
+				<xs:element ref="ifc:title_of_the_document"/>
+			</xs:choice>
+			<xs:choice>
+				<xs:element ref="ifc:Commission_opinion"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_part" mixed="true">
+		<xs:sequence>
+			<xs:element ref="ifc:heading"/>
+			<xs:element ref="ifc:subject"/>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="ifc:title" maxOccurs="unbounded"/>
+				<xs:element ref="ifc:article" maxOccurs="unbounded"/>
+				<xs:element ref="ifc:point" maxOccurs="unbounded"/>
+				<xs:element ref="ifc:section" maxOccurs="unbounded"/>
+				<xs:element ref="ifc:unnumbered_paragraph" maxOccurs="unbounded"/>
+				<xs:element ref="ifc:introductory_part" maxOccurs="unbounded"/>
+				<xs:element ref="ifc:closing_part" maxOccurs="unbounded"/>
+				<xs:element ref="ifc:chapter">
+					<xs:annotation>
+						<xs:documentation>
+							<cv:contains>
+								<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+							</cv:contains>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref="ifc:indent" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>
+							<cv:contains>
+								<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+							</cv:contains>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_place_and_date" mixed="true">
+		<xs:sequence>
+			<xs:element ref="ifc:date" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_point" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:numbering" minOccurs="0"/>
+			<!--
+			The idea is that a point will always have just <numbering/> instead of <heading><numbering/></heading>.
+			In that case possibly we don't need the heading anymore. - TODO to be verified
+			<xs:element ref="ifc:heading" minOccurs="0"/>
+			-->
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="ifc:indent"/>
+				<xs:element ref="ifc:subparagraph"/>
+				<!--
+				Do we now use always subparagraph under the point?
+				<xs:element ref="ifc:unnumbered_paragraph"/>
+				-->
+				<xs:element ref="ifc:point"/>
+				<xs:element ref="ifc:note"/>
+				<xs:element ref="ifc:scientific_formula"/>
+				<xs:element ref="ifc:date"/>
+				<xs:element ref="ifc:table"/>
+				<xs:element ref="ifc:text_of_the_amendment"/>
+				<xs:element ref="ifc:introductory_part"/>
+				<xs:element ref="ifc:closing_part"/>
+				<xs:element ref="ifc:quotation"/>
+				<xs:element ref="ifc:legal_basis"/>
+			</xs:choice>
+		</xs:sequence>
+		<!-- TODO provide the test -->
+		<xs:assert test="fn:true()">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>No point subject in annexes</cv:title>
+						<cv:definition>Subject is not supposed to be used in annexes points (use subparagraph instead).</cv:definition>
+						<cv:comment>Currently it seems still to be used e.g. in statement_of_reasons points so it can't be removed completely.</cv:comment>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="not(ifc:heading) or ifc:heading[fn:normalize-space(text())]">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Sole numbering in a point</cv:title>
+						<cv:definition>Use just "numbering" without "heading" if there is no extra text.</cv:definition>
+						<cv:example>
+							<cv:title>Avoid</cv:title>
+							<cv:code>&lt;heading&gt;<cv:br/>
+<cv:indent/>&lt;numbering&gt;1.&lt;/numbering&gt;<cv:br/>
+&lt;/heading&gt;</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Use instead</cv:title>
+							<cv:code>&lt;numbering&gt;1.&lt;/numbering&gt;</cv:code>
+						</cv:example>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="not(ifc:unnumbered_paragraph and (ifc:introductory_part or ifc:point))">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Points in unnumbered paragraphs</cv:title>
+						<cv:definition>If there are some "unnumbered_paragraph"s in the point so the "introductory_part" + "point"s has to be encapsulated in the unnumbered_paragraph as well.</cv:definition>
+						<cv:example>
+							<cv:title>Avoid</cv:title>
+							<cv:code>&lt;unnumbered_paragraph&gt;text&lt;/unnumbered_paragraph&gt;<cv:br/>
+&lt;introductory_part&gt;intro:&lt;/introductory_part&gt;<cv:br/>
+&lt;point&gt;text&lt;/point&gt;</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Use instead</cv:title>
+							<cv:code>&lt;unnumbered_paragraph&gt;text&lt;/unnumbered_paragraph&gt;<cv:br/>
+&lt;unnumbered_paragraph&gt;<cv:br/>
+<cv:indent/>&lt;introductory_part&gt;intro:&lt;/introductory_part&gt;<cv:br/>
+<cv:indent/>&lt;point&gt;text&lt;/point&gt;<cv:br/>
+&lt;/unnumbered_paragraph&gt;</cv:code>
+						</cv:example>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="not(text()[fn:normalize-space(.)!='' and matches(fn:replace(.,'^\s*(.+)\s*$','$1'),'\n')])">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Missing paragraphs</cv:title>
+						<cv:definition>If the '\n' is found so there is probably a missing &lt;unnumbered_paragraph/&gt; or &lt;subparagraph/&gt;.</cv:definition>
+						<cv:comment>This rule helps to detect problems especially in files converted from Formex. In the other files it ensures common formatting.</cv:comment>
+						<cv:example>
+							<cv:title>Avoid</cv:title>
+							<cv:code>Text.<cv:br/>
+Text.</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Use instead</cv:title>
+							<cv:code>Text. Text.</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Or</cv:title>
+							<cv:code>&lt;unnumbered_paragraph&gt;Text.&lt;/unnumbered_paragraph&gt;<cv:br/>
+&lt;unnumbered_paragraph&gt;Text.&lt;/unnumbered_paragraph&gt;</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Or</cv:title>
+							<cv:code>&lt;subparagraph&gt;Text.&lt;/subparagraph&gt;<cv:br/>
+&lt;subparagraph&gt;Text.&lt;/subparagraph&gt;</cv:code>
+						</cv:example>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="not(count(ifc:unnumbered_paragraph|ifc:subparagraph|ifc:table)=1)">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>No single paragraph in a point</cv:title>
+						<cv:definition>Point does not allow a standalone &lt;unnumbered_paragraph/&gt; or a single &lt;subparagraph/&gt;. Their use is permitted only when there are more of them. However, a table is not encapsulated by a subparagraph.</cv:definition>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+	<xs:complexType name="t_position">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="ifc:title_of_the_document"/>
+				<xs:element ref="ifc:reference"/>
+			</xs:choice>
+			<xs:element ref="ifc:decision"/>
+			<xs:element ref="ifc:statement_of_reasons"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_preamble" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:acting_entity" maxOccurs="unbounded"/>
+			<xs:element ref="ifc:citation" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:sequence minOccurs="0">
+				<xs:element ref="ifc:introduction_to_the_recitals" minOccurs="0"/>
+				<xs:element ref="ifc:recital" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:element ref="ifc:enacting_formula" minOccurs="0"/>
+		</xs:sequence>
+		<xs:assert test="not(ifc:citation) or ifc:citation/ifc:legal_basis">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>At least one legal basis</cv:title>
+						<cv:definition>At least one &lt;legal_basis/&gt; has to be present among the citations when citations are provided.</cv:definition>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+	<xs:complexType name="t_proposal_for_a_decision" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:logo"/>
+			<xs:element ref="ifc:place_and_date"/>
+			<xs:element ref="ifc:reference"/>
+			<xs:element ref="ifc:procedure_identifier"/>
+			<xs:choice>
+				<xs:element ref="ifc:title_of_the_document"/>
+			</xs:choice>
+			<xs:element ref="ifc:EEA_relevance"/>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="ifc:reference"/>
+				<xs:element ref="ifc:version" minOccurs="0"/>
+			</xs:sequence>
+			<xs:element ref="ifc:explanatory_memorandum"/>
+			<xs:element ref="ifc:decision"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_proposal_for_a_directive" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:logo"/>
+			<xs:element ref="ifc:place_and_date"/>
+			<xs:element ref="ifc:reference"/>
+			<xs:element ref="ifc:procedure_identifier"/>
+			<xs:choice>
+				<xs:element ref="ifc:title_of_the_document"/>
+			</xs:choice>
+			<xs:element ref="ifc:EEA_relevance" minOccurs="0"/>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="ifc:reference"/>
+				<xs:element ref="ifc:version" minOccurs="0"/>
+			</xs:sequence>
+			<xs:element ref="ifc:explanatory_memorandum"/>
+			<xs:element ref="ifc:directive"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_proposal_for_a_regulation">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:logo"/>
+			<xs:element ref="ifc:place_and_date"/>
+			<xs:element ref="ifc:reference"/>
+			<xs:element ref="ifc:procedure_identifier"/>
+			<xs:choice>
+				<xs:element ref="ifc:title_of_the_document"/>
+			</xs:choice>
+			<xs:element ref="ifc:EEA_relevance" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:cov_version>1.2</cv:cov_version>
+							<cv:cov_version_removed>2.1</cv:cov_version_removed>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ifc:explanatory_memorandum"/>
+			<xs:element ref="ifc:procedure_identifier" minOccurs="0"/>
+			<xs:element ref="ifc:regulation"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_statement_of_reasons">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="ifc:logo" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+							<cv:contains>
+								<cv:cov_version>3.0</cv:cov_version>
+							</cv:contains>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref="ifc:place_and_date" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>
+							<cv:contains>
+								<cv:cov_version>3.0</cv:cov_version>
+							</cv:contains>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref="ifc:reference">
+					<xs:annotation>
+						<xs:documentation>
+							<cv:contains>
+								<cv:cov_version>3.0</cv:cov_version>
+							</cv:contains>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref="ifc:procedure_identifier">
+					<xs:annotation>
+						<xs:documentation>
+							<cv:contains>
+								<cv:cov_version>3.0</cv:cov_version>
+							</cv:contains>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref="ifc:type_of_document">
+					<xs:annotation>
+						<xs:documentation>
+							<cv:contains>
+								<cv:cov_version>3.0</cv:cov_version>
+							</cv:contains>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref="ifc:heading">
+					<xs:annotation>
+						<xs:documentation>
+							<cv:contains>
+								<cv:cov_version>3.0</cv:cov_version>
+							</cv:contains>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref="ifc:title_of_the_document">
+					<xs:annotation>
+						<xs:documentation>
+							<cv:contains>
+								<cv:cov_version>3.0</cv:cov_version>
+							</cv:contains>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+			<xs:element ref="ifc:subject" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:cov_version>3.0</cv:cov_version>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="ifc:section"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_quotation" mixed="true">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="ifc:point"/>
+			<xs:element ref="ifc:numbered_paragraph">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:cov_version>3.0</cv:cov_version>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ifc:unnumbered_paragraph">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:cov_version>3.0</cv:cov_version>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ifc:subparagraph"/>
+			<xs:element ref="ifc:introductory_part"/>
+			<xs:element ref="ifc:closing_part"/>
+			<xs:element ref="ifc:article">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:cov_version>3.0</cv:cov_version>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ifc:annex">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:cov_version>3.0</cv:cov_version>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ifc:heading">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:cov_version>3.0</cv:cov_version>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ifc:subject">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:cov_version>3.0</cv:cov_version>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ifc:quotation"/>
+			<xs:element ref="ifc:date"/>
+			<xs:element ref="ifc:note"/>
+			<xs:element ref="ifc:chapter">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:cov_version>3.0</cv:cov_version>
+							<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ifc:indent">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:cov_version>3.0</cv:cov_version>
+							<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ifc:title">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:cov_version>3.0</cv:cov_version>
+							<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ifc:scientific_formula">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:cov_version>3.0</cv:cov_version>
+							<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+		<xs:assert test="text()[1][matches(fn:normalize-space(.),'^(''|&quot;|‘)')]">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Beginning of the quotation</cv:title>
+						<cv:definition>The quotation content has to start with a quotation mark.</cv:definition>
+						<cv:example>
+							<cv:title>Wrong</cv:title>
+							<cv:code>&lt;quotation&gt;TEXT&lt;/quotation&gt;</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Correct</cv:title>
+							<cv:code>&lt;quotation&gt;"TEXT"&lt;/quotation&gt;</cv:code>
+						</cv:example>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="text()[last()][matches(fn:normalize-space(.),'(''|&quot;|’)$')]">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Ending of the quotation</cv:title>
+						<cv:definition>The quotation content has to end with a quotation mark.</cv:definition>
+						<cv:example>
+							<cv:title>Wrong</cv:title>
+							<cv:code>&lt;quotation&gt;TEXT&lt;/quotation&gt;</cv:code>
+						</cv:example>
+						<cv:example>
+							<cv:title>Correct</cv:title>
+							<cv:code>&lt;quotation&gt;"TEXT"&lt;/quotation&gt;</cv:code>
+						</cv:example>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+		<!--
+		TODO: possibly this should be just a warning?
+		      E.g. see 32017R2393_annex_I_20190222.cov.xml, point 1, the text after "Subject: "
+		-->
+	</xs:complexType>
+	<xs:complexType name="t_text_of_the_amendment" mixed="true">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element ref="ifc:point"/>
+			<xs:element ref="ifc:numbered_paragraph"/>
+			<xs:element ref="ifc:numbering"/>
+			<xs:element ref="ifc:unnumbered_paragraph"/>
+			<xs:element ref="ifc:subparagraph"/>
+			<xs:element ref="ifc:introductory_part"/>
+			<xs:element ref="ifc:closing_part"/>
+			<xs:element ref="ifc:article"/>
+			<xs:element ref="ifc:indent"/>
+			<xs:element ref="ifc:heading"/>
+			<xs:element ref="ifc:subject"/>
+			<xs:element ref="ifc:section"/>
+			<xs:element ref="ifc:chapter"/>
+			<xs:element ref="ifc:table"/>
+			<xs:element ref="ifc:note">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>	
+			</xs:element>
+			<xs:element ref="ifc:title">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ifc:scientific_formula">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+		<xs:assert test="text()[1][matches(fn:normalize-space(.),'^(''|&quot;|‘)')] or text()[last()][matches(fn:normalize-space(.),'(''|&quot;|’)$')]">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:jira_validation>IFCCV-501</cv:jira_validation>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>proposed</cv:status>
+						<cv:title>Quotation marks</cv:title>
+						<cv:definition>In amending acts, every text of the amendment starts with a quotation mark and finishes with a quotation mark, but these quotation marks are not part of the text to be inserted in the amended act.</cv:definition>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+
+	<xs:complexType name="t_recital" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:numbering" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="ifc:note"/>
+				<xs:element ref="ifc:date"/>
+				<xs:element ref="ifc:quotation"/>
+				<xs:element ref="ifc:legal_basis"/>
+				<!-- <xs:element ref="ifc:change_to_original_text" minOccurs="0" maxOccurs="unbounded"/> -->
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_regulation">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:procedure_identifier" minOccurs="0"/>
+			<xs:choice>
+				<xs:element ref="ifc:title_of_the_document"/>
+			</xs:choice>
+			<xs:element ref="ifc:EEA_relevance" minOccurs="0"/>
+			<xs:element ref="ifc:preamble"/>
+			<xs:element ref="ifc:enacting_terms"/>
+			<xs:element ref="ifc:direct_applicability"/>
+			<xs:element ref="ifc:signature"/>
+			<xs:element ref="ifc:annex" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_row" mixed="false">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="ifc:cell"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="t_cell" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="ifc:date"/>
+			<xs:element ref="ifc:scientific_formula"/>
+			<xs:element ref="ifc:note"/>
+			<xs:element ref="ifc:numbering"/>
+			<xs:element ref="ifc:table"/>
+			<xs:element ref="ifc:indent"/>
+			<xs:element ref="ifc:introductory_part"/>
+			<xs:element ref="ifc:closing_part"/>
+			<xs:element ref="ifc:point"/>
+			<xs:element ref="ifc:procedure_identifier"/>
+			<xs:element ref="ifc:reference"/>
+			<xs:element ref="ifc:quotation"/>
+		</xs:choice>
+		<xs:attribute name="rowspan" type="xs:integer"/>
+		<xs:attribute name="colspan" type="xs:integer"/>
+	</xs:complexType>
+	<xs:complexType name="t_column" mixed="false">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="ifc:cell"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="t_header_of_a_table" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="ifc:cell"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="t_caption" mixed="true">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="ifc:date"/>
+			<xs:element ref="ifc:scientific_formula"/>
+			<xs:element ref="ifc:numbering"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="t_scientific_formula" mixed="true">
+		<xs:sequence minOccurs="0">
+			<xs:any namespace="http://www.w3.org/1998/Math/MathML" processContents="lax"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_section" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:heading" minOccurs="0"/>
+			<xs:element ref="ifc:subject" minOccurs="0"/>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element ref="ifc:sub-section"/>
+				<xs:element ref="ifc:article"/>
+				<xs:element ref="ifc:point"/>
+				<xs:element ref="ifc:indent"/>
+				<xs:element ref="ifc:unnumbered_paragraph"/>
+				<xs:element ref="ifc:table"/>
+				<xs:element ref="ifc:note"/>
+				<xs:element ref="ifc:introductory_part"/>
+				<xs:element ref="ifc:closing_part"/>
+				<xs:element ref="ifc:quotation">
+					<xs:annotation>
+						<xs:documentation>
+							<cv:contains>
+								<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+							</cv:contains>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="class" type="xs:string">
+			<!-- annotation commented as a this moment is not properly processed (rather ignored) by the pdf generator
+		<xs:annotation>
+			<xs:documentation>Narrows down the purpose of the section, e.g. sections in explanatory memorandum can be: proposal_rationale, subsidiarity, proportionality, ...</xs:documentation>
+		</xs:annotation>
+		-->
+		</xs:attribute>
+		<!-- TODO provide the test -->
+		<xs:assert test="fn:true()">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>No single section in an annex</cv:title>
+						<cv:definition>Section can't be a single element below annex if it does not have a subject.</cv:definition>
+						<cv:comment>Delete the section element and keep only the content.</cv:comment>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+	<xs:complexType name="t_signatory" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence/>
+	</xs:complexType>
+	<xs:complexType name="t_signature" mixed="true">
+		<xs:sequence>
+			<xs:element ref="ifc:unnumbered_paragraph" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:cov_version>3.0</cv:cov_version>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ifc:place_and_date"/>
+			<xs:element ref="ifc:signatory" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_subject" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:numbering" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:cov_version_removed>2.1</cv:cov_version_removed>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="ifc:date">
+					<xs:annotation>
+						<xs:documentation>
+							<cv:contains>
+								<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+							</cv:contains>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<!-- <xs:element ref="ifc:change_to_original_text"/> -->
+				<xs:element ref="ifc:quotation"/>
+				<xs:element ref="ifc:note"/>
+				<xs:element ref="ifc:scientific_formula">
+					<xs:annotation>
+						<xs:documentation>
+							<cv:contains>
+								<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+							</cv:contains>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+			<xs:element ref="ifc:procedure_stage" minOccurs="0"/>
+		</xs:sequence>
+		<xs:assert test="not(text()[matches(fn:normalize-space(.),'^(article )','i')])">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Missing heading</cv:title>
+						<cv:definition>If subject starts with one of: "article ", so there was missed a heading.</cv:definition>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+	<xs:complexType name="t_subparagraph" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="ifc:note"/>
+			<xs:element ref="ifc:scientific_formula"/>
+			<xs:element ref="ifc:table"/>
+			<xs:element ref="ifc:date"/>
+			<xs:element ref="ifc:point"/>
+			<xs:element ref="ifc:indent"/>
+			<xs:element ref="ifc:legal_basis"/>
+			<xs:element ref="ifc:quotation"/>
+			<xs:element ref="ifc:introductory_part"/>
+			<xs:element ref="ifc:closing_part"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="t_sub-section" mixed="true">
+		<xs:sequence>
+			<xs:element ref="ifc:heading" minOccurs="0"/>
+			<xs:element ref="ifc:subject" minOccurs="0"/>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="ifc:article"/>
+				<xs:element ref="ifc:sub-section"/>
+				<xs:element ref="ifc:unnumbered_paragraph"/>
+				<xs:element ref="ifc:introductory_part"/>
+				<xs:element ref="ifc:closing_part"/>
+				<xs:element ref="ifc:point"/>
+				<xs:element ref="ifc:indent">
+					<xs:annotation>
+						<xs:documentation>
+							<cv:contains>
+								<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+							</cv:contains>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="class" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Narrows down the purpose of the sub-section, e.g. sub-sections in explanatory memorandum can be: proposal_rationale, subsidiarity, proportionality, ...</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<!-- TODO provide the test -->
+		<xs:assert test="fn:true()">
+			<xs:annotation>
+				<xs:documentation>
+					<cv:rule>
+						<cv:cov_version>2.1</cv:cov_version>
+						<cv:status>assertion</cv:status>
+						<cv:title>Sub-section can't have "article" heading</cv:title>
+						<cv:definition>Sub-section with a heading "article" should be an article.</cv:definition>
+					</cv:rule>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+	<xs:complexType name="t_table" mixed="false">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:element ref="ifc:caption" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="ifc:header_of_a_table"/>
+				<xs:element ref="ifc:row"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_EP_consolidated_text" mixed="true">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element ref="ifc:title_of_the_document"/>
+			</xs:choice>
+			<xs:element ref="ifc:EEA_relevance"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_EP_legislature" mixed="true">
+		<xs:sequence/>
+	</xs:complexType>
+	<xs:complexType name="t_EP_text_adopted" mixed="true">
+		<xs:sequence>
+			<xs:element ref="ifc:logo"/>
+			<xs:element ref="ifc:EP_legislature"/>
+			<xs:element ref="ifc:type_of_document"/>
+			<xs:element ref="ifc:version"/>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element ref="ifc:reference"/>
+				<xs:element ref="ifc:version" minOccurs="0"/>
+			</xs:sequence>
+			<xs:element ref="ifc:subject"/>
+			<xs:element ref="ifc:legislative_resolution"/>
+			<xs:element ref="ifc:annex" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_title" mixed="true">
+		<xs:sequence>
+			<xs:element ref="ifc:heading"/>
+			<xs:element ref="ifc:subject"/>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="ifc:chapter"/>
+				<xs:element ref="ifc:article"/>
+				<xs:element ref="ifc:point">
+					<xs:annotation>
+						<xs:documentation>
+							<cv:contains>
+								<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+							</cv:contains>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref="ifc:indent">
+					<xs:annotation>
+						<xs:documentation>
+							<cv:contains>
+								<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+							</cv:contains>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<!-- End of addition -->
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- TODO remove as soon as it is removed from the XML markup -->
+	<xs:complexType name="t_title_of_the_act" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="ifc:date"/>
+				<xs:element ref="ifc:legal_basis"/>
+			</xs:choice>
+			<xs:element ref="ifc:type_of_act"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="ifc:date"/>
+				<xs:element ref="ifc:legal_basis"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="t_title_of_the_document" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="ifc:date"/>
+			<xs:element ref="ifc:type_of_document"/>
+			<xs:element ref="ifc:legal_basis"/>
+			<xs:element ref="ifc:scientific_formula">
+				<xs:annotation>
+					<xs:documentation>
+						<cv:contains>
+							<cv:allow_empty>XMLHD-1614</cv:allow_empty>
+						</cv:contains>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="t_unnumbered_paragraph" mixed="true">
+		<xs:openContent mode="interleave">
+			<xs:any namespace="##other" processContents="lax"/>
+		</xs:openContent>
+		<xs:sequence>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="ifc:indent"/>
+				<xs:element ref="ifc:point"/>
+				<xs:element ref="ifc:note"/>
+				<xs:element ref="ifc:scientific_formula"/>
+				<xs:element ref="ifc:table"/>
+				<xs:element ref="ifc:date"/>
+				<xs:element ref="ifc:legal_basis"/>
+				<xs:element ref="ifc:introductory_part"/>
+				<xs:element ref="ifc:closing_part"/>
+				<xs:element ref="ifc:quotation"/>
+				<xs:element ref="ifc:text_of_the_amendment"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<!--
+####################################################################################################
+#
+# Element definitions
+#
+####################################################################################################
+-->
+	<!-- IFCCV-91 Decidion on the name of the concept; name was: "institution_adopting"-->
+	<xs:element name="acting_entity" type="ifc:t_acting_entity" id="ifc0023">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<!-- IFCCV-92 Decidion on the definition of the concept; was: "
+                <cv:p>The name of the insitution or institutions which adopted the <cv:a href="#doc_type_regulation">act</cv:a>
+                    <cv:source>JPG 8.6. (3)</cv:source>."</cv:p>-->
+				<cv:p>Indicates the name of the enacting entity or entities of an <cv:a href="#doc_component_type_of_act">act</cv:a>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="annex" type="ifc:t_annex" id="ifc0017">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Annexes in the strict sense are used to present material separately from the body of the <cv:a href="#doc_component_enacting_terms">enacting terms</cv:a> because they are voluminous or technical or both <cv:source>JPG 22.1.</cv:source>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+
+	<xs:element name="annexes" type="ifc:t_annexes">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-183</cv:jira_validation>
+					<cv:cov_version>3.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+				</cv:concept>
+				<cv:document_type>yes</cv:document_type>
+				<cv:p>In a proposal, a separate document containing several <cv:a href="#doc_component_annex">annexes</cv:a> to the act itself.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+
+	<xs:element name="article" type="ifc:t_article" id="ifc0010">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Basic unit of the <cv:a href="#doc_component_enacting_terms">enacting terms</cv:a> of a legal <cv:a href="#doc_component_type_of_act">act</cv:a> <cv:source>JPG 15.4. (table)</cv:source>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="caption" type="ifc:t_caption">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-413</cv:jira_validation>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+					<!--
+					Instead of displaying just the caption, the ".." selector
+					will select the parent of the caption (i.e. table), and display
+					the caption in the context.
+					 -->
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates information on the table and/or its content.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="cell" type="ifc:t_cell">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-413</cv:jira_validation>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+					<!--
+					Instead of displaying just the cell, the "../.." selector
+					will select the parent of the cell (i.e. table), and display
+					the cell in the context.
+					 -->
+					<cv:example selector="../.."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Lowest subdivision in a table.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="change_indicator" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-403</cv:jira_validation>
+					<cv:cov_version>3.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p/>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="change_to_original_text" type="ifc:t_change_to_original_text">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-404</cv:jira_validation>
+					<cv:cov_version>3.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Text which has been inserted, modified or deleted.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="chapter" type="ifc:t_chapter">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-200</cv:jira_validation>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates a level of higher subdivisions of an <cv:a href="#doc_component_type_of_act">act</cv:a><cv:source>JPG 15.4.</cv:source>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="citation" type="ifc:t_citation" id="ifc0003">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Sets out the <cv:a href="#doc_component_legal_basis">legal basis</cv:a> of an <cv:a href="#doc_component_type_of_act">act</cv:a> or a main step in the procedure leading to its adoption <cv:source>JPG 9.</cv:source>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="closing_part" type="ifc:t_closing_part">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-410</cv:jira_validation>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+                    <!--
+					Instead of displaying just the closing_part, the ".." selector
+					will select the parent of the cell (i.e. element including also the introductiory_part+points), and display
+					the closing_part in the context.
+					 -->
+                    <cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>In exceptional cases, the last element of a text passage with enumeration, integral to that text passage, appearing directly after the last point or indent, starting in a lower case and closing that passage of the text.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="column" type="ifc:t_column">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-413</cv:jira_validation>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Represents in a table a set of related data vertically.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="Commission_communication" type="ifc:t_Commission_communication">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-412</cv:jira_validation>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Non-binding Commission document providing information.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="Commission_opinion" type="ifc:t_Commission_opinion">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-394</cv:jira_validation>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Non-binding document from the European Commission providing its detailed position.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="communication" type="ifc:t_communication">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-411</cv:jira_validation>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>yes</cv:document_type>
+				<cv:p>Non-binding document of an institution providing information.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="date" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<cv:example selector="../.."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Identifies a specific day in time.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="decision" type="ifc:t_decision">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>yes</cv:document_type>
+				<cv:p>Legal <cv:a href="#doc_component_type_of_act">act</cv:a> of the European Union described in the fourth paragraph of Article 288 TFEU.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="direct_applicability" type="xs:string" id="ifc0028">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Corresponds, in <cv:a href="#doc_type_regulation">regulations</cv:a>, to the special formula used after the final <cv:a href="#doc_component_article">article</cv:a> as regards the binding and directly applicable nature.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="directive" type="ifc:t_directive" id="ifc0100">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>yes</cv:document_type>
+				<cv:p>Legal <cv:a href="#doc_component_type_of_act">act</cv:a> of the European Union specified in Article 288 TFEU.</cv:p>-->
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="EEA_relevance" type="xs:string" id="ifc0018">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<!--
+					Instead of displaying just the EEA_relevance, the ".." selector
+					will select the parent of the EEA_relevance (i.e. the root document element typically), and display
+					the EEA_relevance in the context.
+					 -->
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates that the subject-matter of an <cv:a href="#doc_component_type_of_act">act</cv:a> is governed by the Agreement on the European Economic Area (EEA) <cv:source>JH A, p.1</cv:source>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="emblem">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+                    <cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Graphical element identifying an entity.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="enacting_formula" type="xs:string" id="ifc0038">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<cv:example selector="preceding-sibling::*[1]|.|following-sibling::*"/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates the text between <cv:a href="#doc_component_recital">recitals</cv:a> and <cv:a href="#doc_component_enacting_terms">enacting terms</cv:a>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="enacting_terms" type="ifc:t_enacting_terms" id="ifc0005">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Operative part of the <cv:a href="#doc_component_type_of_act">act</cv:a>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="EP_consolidated_text" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-451</cv:jira_validation>
+					<cv:cov_version>2.1</cv:cov_version>
+					<cv:status>proposed</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>European Parliament's position after first or second reading in the context of the ordinary legislative procedure.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="EP_legislature" type="ifc:t_EP_legislature">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-444</cv:jira_validation>
+					<cv:cov_version>2.1</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<!--
+Instead of displaying just the EP_legislature, the ".." selector
+will select the parent of the EP_legislature (i.e. EP_text_adopted), and display
+the EP_legislature in the context.
+ -->
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates the European Parliament legislative term.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="EP_text_adopted" type="ifc:t_EP_text_adopted">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-443</cv:jira_validation>
+					<cv:cov_version>2.1</cv:cov_version>
+					<cv:status>proposed</cv:status>
+				</cv:concept>
+				<cv:document_type>yes</cv:document_type>
+				<cv:p>Resolution adopted by the European Parliament giving its position in the context of a given procedure.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="explanatory_memorandum" type="ifc:t_explanatory_memorandum" id="ifc0014">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Document which accompanies all Commission proposals submitted to the Council or to the European Parliament and the Council.
+          It explains the context, justifications and foreseen impact of the Commission's proposal based on the different stages of the preparatory process.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="header_of_a_table" type="ifc:t_header_of_a_table">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-413</cv:jira_validation>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+                    <cv:example selector="../.."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Header of one or more columns or of one or more rows in a table.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="heading" type="ifc:t_heading">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>The term required accompanied by <cv:a href="#doc_component_numbering">numbering</cv:a>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<!-- TODO no Jira issue created yet -->
+	<xs:element name="implementing_regulation" type="ifc:t_implementing_regulation">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>3.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+				</cv:concept>
+				<cv:document_type>yes</cv:document_type>
+				<cv:p>Legal <cv:a href="#doc_component_type_of_act">act</cv:a> of the European Union described in the fourth paragraph of Article 288 TFEU.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="indent" type="ifc:t_indent">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates each element of an enumeration under a <cv:a href="#doc_component_point">point</cv:a>. Each indent is preceded by a dash.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<!-- TODO no Jira issue created yet -->
+	<xs:element name="international_agreement" type="ifc:t_international_agreement">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>3.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+				</cv:concept>
+				<cv:document_type>yes</cv:document_type>
+				<cv:p>Legal <cv:a href="#doc_component_type_of_act">act</cv:a> of the European Union described in the fourth paragraph of Article 288 TFEU.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="introduction_to_the_recitals" type="xs:string" id="ifc0058">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<cv:example selector="preceding-sibling::*[1]|.|following-sibling::*"/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates the word ‘whereas’ at the beginning of the <cv:a href="#doc_component_statement_of_legal_reasons">statement of the reasons</cv:a>
+					<cv:source>JPG 10.1.</cv:source>.
+				</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="introductory_part" type="ifc:t_introductory_part">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-409</cv:jira_validation>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Typographical paragraph, in the beginning of a provision, preceding a  <cv:a href="#doc_component_point">point</cv:a> or an  <cv:a href="#doc_component_indent">indent</cv:a>, and that ends with a colon ":".</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="legal_basis" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+                    <!--
+Instead of displaying just the legal_basis, the ".." selector
+will select the parent of the legal_basis (i.e. typically a citation), and display
+the legal_basis in the context.
+ -->
+                    <cv:example selector=".."/>
+                </cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Provision(s) which directly confer competence to adopt the <cv:a href="#doc_component_type_of_act">act</cv:a>, whether preceded or not by a general reference to the Treaty/ies.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="legislative_resolution" type="ifc:t_legislative_resolution">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-449</cv:jira_validation>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>European Parliament's position on a given draft legislative act.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="logo" type="ifc:t_logo">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Graphic(al) element identifying an <cv:a href="#doc_component_acting_entity">entity</cv:a> consisting of the <cv:a href="#doc_component_emblem">emblem</cv:a> of the entity complemented by the name of the entity (author/proponent).</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="note" type="ifc:t_note" id="ifc0049">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Consists of additional information giving further explanation/details to the reader.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="numbered_paragraph" type="ifc:t_numbered_paragraph" id="ifc0011">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates an independent subdivision of an <cv:a href="#doc_component_article">article</cv:a>
+					<cv:source>JPG 15.4. (table)</cv:source> or of a part of an <cv:a href="#doc_component_annex">annex</cv:a>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="numbering" type="ifc:t_numbering" id="ifc0007">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates the number or letter used for structural identification <cv:source>JH C.9.3.2., p. 29</cv:source>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="opinion" type="ifc:t_opinion">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-395</cv:jira_validation>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>yes</cv:document_type>
+				<cv:p>Non-binding document from an entity providing its detailed position.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="part" type="ifc:t_part">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates the highest level of higher subdivisions of an <cv:a href="#doc_component_type_of_act">act</cv:a>
+					<cv:source>JPG 15.4.</cv:source> or of an <cv:a href="#doc_component_annex">annex</cv:a>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="place_and_date" type="ifc:t_place_and_date">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>
+          Indicates the date of <cv:a href="#doc_component_signature">signature</cv:a> for <cv:a href="#doc_component_type_of_act">acts</cv:a> adopted in an ordinary legislative procedure, the budget and budget
+          decisions adopted by the European Parliament and the Council <cv:source>JPG 8.6. (4)</cv:source> or the date
+          of <cv:a href="#doc_component_signature">signature</cv:a> of other acts as well as the place.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="point" type="ifc:t_point" id="ifc0013">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates each element of an enumeration under a paragraph or a <cv:a href="#doc_component_subparagraph">subparagraph</cv:a> (this enumeration being generally preceded by an introductory phrase) or the basic unit generally used for the provisions of an <cv:a href="#doc_component_annex">annex</cv:a>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="preamble" type="ifc:t_preamble" id="ifc0002">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Part of an <cv:a href="#doc_component_type_of_act">act</cv:a> after the title and before the <cv:a href="#doc_component_enacting_terms">enacting terms</cv:a>, including the <cv:a href="#doc_component_citation">citations</cv:a>, the <cv:a href="#doc_component_recital">recitals</cv:a> and the solemn forms which precede, respectively follow them.
+        </cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="procedure_identifier" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+                    <cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Unique reference number for interinstitutional procedures.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="procedure_stage" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-445</cv:jira_validation>
+					<cv:cov_version>2.1</cv:cov_version>
+					<cv:status>proposed</cv:status>
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Code or full wording indication of the current stage of a procedure.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="proposal_for_a_decision" type="ifc:t_proposal_for_a_decision">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>yes</cv:document_type>
+				<cv:p>Version of a <cv:a href="#doc_type_directive">decision</cv:a> as issued by the <cv:a href="#doc_component_proposing_entity">proposing entity</cv:a> for the purpose of its adoption by the <cv:a href="#doc_component_acting_entity">acting entity</cv:a>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="proposal_for_a_directive" type="ifc:t_proposal_for_a_directive">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>yes</cv:document_type>
+				<cv:p>Version of a <cv:a href="#doc_type_regulation">directive</cv:a> as issued by the <cv:a href="#doc_component_proposing_entity">proposing entity</cv:a> for the purpose of its adoption by the <cv:a href="#doc_component_acting_entity">acting entity</cv:a>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="proposal_for_a_regulation" type="ifc:t_proposal_for_a_regulation" id="ifc0200">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>yes</cv:document_type>
+				<cv:p>Version of a <cv:a href="#doc_type_regulation">regulation</cv:a> as issued by the <cv:a href="#doc_component_proposing_entity">proposing entity</cv:a> for the purpose of its adoption by the <cv:a href="#doc_component_acting_entity">acting entity</cv:a>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="proposing_entity" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<cv:example selector="../.."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Name of the proponent institution.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="quotation" type="ifc:t_quotation">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-417</cv:jira_validation>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+					<cv:example selector="..[string-length(quotation/text())>200]"/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Quoted passage from other works or words and thoughts of third parties reported in the text.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="position" type="ifc:t_position">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-502</cv:jira_validation>
+					<cv:cov_version>2.1</cv:cov_version>
+					<cv:status>proposed</cv:status>
+				</cv:concept>
+				<cv:document_type>yes</cv:document_type>
+				<cv:p>Council's position at first reading in the framework of the ordinary legislative procedure (Article 294(5) and (6) TFEU).</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="recital" type="ifc:t_recital" id="ifc0004">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Recitals set out concise reasons for the chief provisions of the <cv:a href="#doc_component_enacting_terms">enacting terms</cv:a>
+					<cv:source>JPG 10.</cv:source>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="reference" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Identifier assigned to a document by an institution.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="regulation" type="ifc:t_regulation" id="ifc0000">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>yes</cv:document_type>
+				<cv:p>Legal <cv:a href="#doc_component_type_of_act">act</cv:a> of the European Union specified in Article 288 TFEU.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="row" type="ifc:t_row">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-413</cv:jira_validation>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+                    <cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Represents in a table a set of related data horizontically.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="scientific_formula" type="ifc:t_scientific_formula">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates a complex technical or scientific expression.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="section" type="ifc:t_section" id="ifc0033">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates the lowest level for grouping <cv:a href="#doc_component_article">articles</cv:a> or <cv:a href="#doc_component_point">points</cv:a> of <cv:a href="#doc_component_annex">annexes</cv:a>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="signatory" type="ifc:t_signatory" id="ifc0031">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Information concerning the signing authority/person.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="signature" type="ifc:t_signature" id="ifc0029">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Includes the <cv:a href="#doc_component_place_and_date">place and date</cv:a> of the signature of an <cv:a href="#doc_component_type_of_act">act</cv:a> as well as the information about the <cv:a href="#doc_component_signatory">signing authorities/person</cv:a>.</cv:p>
+				<!-- IFCCV-34 Decision on the definition of the concept -->
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="subject" type="ifc:t_subject">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Terms reflecting the essential topic of the subdivision of text they precede.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="subparagraph" type="ifc:t_subparagraph">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates the first level of subdivision of a <cv:a href="#doc_component_numbered_paragraph">numbered paragraph</cv:a> where there are at least two of such elements of subdivision. A single subparagraph is consequently not marked-up.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="sub-section" type="ifc:t_sub-section">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates, in exceptional cases and in long and highly structured texts, the division of a <cv:a href="#doc_component_section">section</cv:a>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="statement_of_reasons" type="ifc:t_statement_of_reasons">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-503</cv:jira_validation>
+					<cv:cov_version>2.1</cv:cov_version>
+					<cv:status>proposed</cv:status>
+				</cv:concept>
+				<cv:document_type>yes</cv:document_type>
+				<cv:p>Document accompanying the Council’s position at first reading whereby the Council fully informs the European Parliament of the reasons that led it to deviate from the European Parliament’s position and to adopt its own position at first reading.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="table" type="ifc:t_table">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates an arrangement of data in rows and columns, possibly preceded by a heading.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="text_of_the_amendment" type="ifc:t_text_of_the_amendment">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-406</cv:jira_validation>
+					<cv:cov_version>2.1</cv:cov_version>
+					<cv:status>proposed</cv:status>
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>New text of the provision to be amended.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="title" type="ifc:t_title">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates in long and highly structured texts the grouping of higher subdivisions <cv:source>JPG 15.4., p. 28</cv:source>.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<!-- TODO remove as soon as it is removed from the XML markup -->
+	<xs:element name="title_of_the_act" type="ifc:t_title_of_the_act" id="ifc0001">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:cov_version_removed>2.1</cv:cov_version_removed>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>The title comprises all the information in the <cv:a href="#doc_component_heading">heading</cv:a> of the <cv:a href="#doc_component_type_of_act">act</cv:a> which serves to identify it <cv:source>JPG 7.1.</cv:source>.</cv:p>
+				<cv:inclusion ref="exp_title_of_the_act.html">Example for the title of an act</cv:inclusion>
+			</xs:documentation>
+		</xs:annotation>
+		<!-- IFCCV-8, 130, 147 Decision on the name of the concept; name was "title_of_the_regulation"-->
+	</xs:element>
+	<xs:element name="title_of_the_document" type="ifc:t_title_of_the_document">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-450</cv:jira_validation>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Title comprises all information in the <cv:a href="#doc_component_heading">heading</cv:a> of the document which serves to identify it.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<!-- TODO remove as soon as it is removed from the XML markup -->
+	<xs:element name="type_of_act" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:cov_version_removed>2.1</cv:cov_version_removed>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indication of the type of act (<cv:a href="#doc_type_regulation">regulation</cv:a>, <cv:a href="#doc_type_directive">directive</cv:a>, <cv:a href="#decision">decision</cv:a>, where appropriate ‘implementing’ or ‘delegated’) <cv:source>JPG 8.6. (1)</cv:source>.
+        </cv:p>
+				<cv:inclusion ref="exp_type_of_act.html">Example for the type of an act as component of the title</cv:inclusion>
+			</xs:documentation>
+		</xs:annotation>
+		<!-- IFCCV-149 Decision to maintain concept -->
+	</xs:element>
+	<xs:element name="type_of_document" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-447</cv:jira_validation>
+					<cv:cov_version>2.0</cv:cov_version>
+					<cv:status>proposed</cv:status>
+                    <cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indication of the type of document.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="unnumbered_paragraph" type="ifc:t_unnumbered_paragraph" id="ifc0012">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:cov_version>1.2</cv:cov_version>
+					<cv:status>adopted</cv:status>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates the sole element or a non-independent element of an <cv:a href="#doc_component_article">article</cv:a>
+					<cv:source>JPG 15.4. (table)</cv:source> or of a part of an <cv:a href="#doc_component_annex">annex</cv:a>.</cv:p>
+				<!-- IFCCV-5 Decision on the defintion of the concept; definition was:
+                <cv:p>Unnumbered paragraph as body of an <cv:a href="#doc_component_article">article</cv:a> or a subparagraph within a <cv:a
+                        href="#ifc0011">paragraph</cv:a>.</cv:p>
+         -->
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="version" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>
+				<cv:concept>
+					<cv:jira_validation>IFCCV-448</cv:jira_validation>
+					<cv:cov_version>2.1</cv:cov_version>
+					<cv:status>proposed</cv:status>
+					<cv:example selector=".."/>
+				</cv:concept>
+				<cv:document_type>no</cv:document_type>
+				<cv:p>Indicates the current version of the document.</cv:p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<!--
+####################################################################################################
+# Reference to example documents
+####################################################################################################
+-->
+	<xs:annotation>
+		<xs:documentation>
+			<cv:ref_example_document
+				ref="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:22016A1203(03)&amp;from=EN"
+				header="Agreement 22016A1203(03)"
+				xml_ref="agreement_22016a120303/cov"
+			>
+				<cv:deliverable>CoV DLV18 1.11</cv:deliverable>
+				<cv:jira_validation>IFCCV-483</cv:jira_validation>
+				<cv:cov_version>3.0</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52015PC0354&amp;rid=1"
+				header="Communication 52015PC0354"
+				xml_ref="communication_52015PC0354/cov"
+			>
+				<cv:deliverable>CoV DLV18 1.4</cv:deliverable>
+				<cv:jira_validation>IFCCV-440</cv:jira_validation>
+				<!--
+					Planned for validation in 3.0 but is referred by concepts
+					"communication", "Commission_communication"
+					so it needs to be included in 2.1
+				-->
+				<cv:cov_version>3.0</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32013D1313&amp;rid=1"
+				header="Decision 32013D1313"
+				xml_ref="decision_32013d1313/cov"
+			>
+				<cv:deliverable>CoV DLV17 1.5</cv:deliverable>
+				<cv:cov_version>1.1</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32017D0684&amp;rid=1"
+				header="Decision 32017D0684"
+				xml_ref="decision_32017d0684/cov"
+			>
+				<cv:deliverable>CoV DLV18 1.7</cv:deliverable>
+				<cv:jira_validation>IFCCV-442</cv:jira_validation>
+				<cv:cov_version>2.0</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32013L0036&amp;rid=1"
+				header="Directive 32013L0036"
+				xml_ref="directive_32013l0036/cov"
+			>
+				<cv:deliverable>CoV DLV17 1.4</cv:deliverable>
+				<cv:cov_version>1.1</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32015L0254&amp;rid=1"
+				header="Directive 32015L0254"
+				xml_ref="directive_32015l0254/cov"
+			>
+				<cv:deliverable>CoV DLV17 1.7</cv:deliverable>
+				<cv:cov_version>1.1</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52011PC0179&amp;rid=1"
+				header="Opinion 52011PC0179"
+				xml_ref="opinion_52011pc0179/cov"
+			>
+				<cv:deliverable>CoV DLV18 1.3</cv:deliverable>
+				<cv:jira_validation>IFCCV-439</cv:jira_validation>
+				<!--
+					Planned for validation in 3.0 but is referred by concepts
+					"opinion", "Commission_opinion"
+					so it needs to be included in 2.1
+				-->
+				<cv:cov_version>3.0</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52016PC0053&amp;rid=1"
+				header="Proposal for a decision 52016PC0053"
+				xml_ref="proposal_for_a_decision_52016pc0053/cov"
+			>
+				<cv:deliverable>CoV DLV18 1.2</cv:deliverable>
+				<cv:jira_validation>IFCCV-408</cv:jira_validation>
+				<cv:cov_version>1.2</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52013PC0824&amp;rid=1"
+				header="Proposal for a directive 52013PC0824"
+				xml_ref="proposal_for_a_directive_52013pc0824/cov"
+			>
+				<cv:deliverable>CoV DLV18 1.1</cv:deliverable>
+				<cv:jira_validation>IFCCV-407</cv:jira_validation>
+				<cv:cov_version>1.2</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52012PC0064&amp;qid=1523616519165&amp;from=EN"
+				header="Proposal for a regulation 52012PC0064"
+				xml_ref="proposal_for_a_regulation_52012pc0064/cov"
+			>
+				<cv:deliverable>CoV DLV18 1.14</cv:deliverable>
+				<cv:cov_version>3.0</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52016PC0818&amp;rid=1"
+				header="Proposal for a regulation 52016PC0818"
+				xml_ref="proposal_for_a_regulation_52016pc0818/cov"
+			>
+				<cv:deliverable>CoV DLV17 1.2</cv:deliverable>
+				<cv:cov_version>1.1</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52017PC0353&amp;from=EN"
+				header="Proposal for a regulation 52017PC0353"
+				xml_ref="proposal_for_a_regulation_52017pc0353/cov"
+			>
+				<cv:deliverable>CoV DLV18 1.13</cv:deliverable>
+				<cv:cov_version>3.0</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32013R0572&amp;from=EN"
+				header="Regulation 32013R0572"
+				xml_ref="regulation_32013r0572/fmx2cov"
+			>
+				<cv:deliverable>CoV DLV18 1.15</cv:deliverable>
+				<cv:cov_version>3.0</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32013R0575&amp;rid=1"
+				header="Regulation 32013R0575"
+				xml_ref="regulation_32013r0575/cov"
+			>
+				<cv:deliverable>CoV DLV17 1.1</cv:deliverable>
+				<cv:cov_version>1.1</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32014R1024&amp;rid=1"
+				header="Regulation 32013R1024"
+				xml_ref="regulation_32013r1024/cov"
+			>
+				<cv:deliverable>CoV DLV17 1.3</cv:deliverable>
+				<cv:cov_version>1.1</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32013R1291&amp;rid=1"
+				header="Regulation 32013R1291"
+				xml_ref="regulation_32013r1291/cov"
+			>
+				<cv:deliverable>CoV DLV18 1.6</cv:deliverable>
+				<cv:jira_validation>IFCCV-415</cv:jira_validation>
+				<cv:cov_version>2.0</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32013R1380&amp;rid=1"
+				header="Regulation 32013R1380"
+				xml_ref="regulation_32013r1380/cov"
+			>
+				<cv:deliverable>CoV DLV17 1.6</cv:deliverable>
+				<cv:cov_version>1.1</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32014R0254&amp;rid=1"
+				header="Regulation 32014R0254"
+				xml_ref="regulation_32014r0254/cov"
+			>
+				<cv:deliverable>CoV DLV18 1.8</cv:deliverable>
+				<cv:jira_validation>IFCCV-414</cv:jira_validation>
+				<cv:cov_version>2.0</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32014R1384&amp;rid=1"
+				header="Regulation 32014R1384"
+				xml_ref="regulation_32014r1384/cov"
+			>
+				<cv:deliverable>CoV DLV16 1.1</cv:deliverable>
+				<cv:cov_version>1.0</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="32016R1036"
+				header="Regulation 32016R1036"
+				xml_ref="regulation_32016r1036/fmx2cov"
+			>
+				<cv:deliverable>CoV DLV18 1.9</cv:deliverable>
+				<cv:jira_validation>IFCCV-485</cv:jira_validation>
+				<cv:cov_version>10.0</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R1037&amp;from=EN"
+				header="Regulation 32016R1037"
+				xml_ref="regulation_32016r1037/fmx2cov"
+			>
+				<cv:deliverable>CoV DLV18 1.10</cv:deliverable>
+				<cv:jira_validation>IFCCV-486</cv:jira_validation>
+				<cv:cov_version>10.0</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32017R2393&amp;from=EN"
+				header="Regulation 32017R2393"
+				xml_ref="regulation_32017r2393/cov"
+			>
+				<cv:deliverable>CoV DLV18 1.12</cv:deliverable>
+				<cv:jira_validation>IFCCV-472</cv:jira_validation>
+				<cv:cov_version>2.1</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="http://www.europarl.europa.eu/sides/getDoc.do?pubRef=-//EP//TEXT+TA+P8-TA-2017-0425+0+DOC+XML+V0//EN"
+				header="Text adopted P8_TA-PROV(2017)0425"
+				xml_ref="text_adopted_p8_ta-prov20170425/cov"
+			>
+				<cv:deliverable>CoV DLV18 1.5</cv:deliverable>
+				<cv:jira_validation>IFCCV-441</cv:jira_validation>
+				<cv:cov_version>2.1</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52011AG0007&amp;from=EN"
+				header="Statement of the Council's reasons 17602/10 ADD1"
+				xml_ref="position_17602-10ADD1/fmx2cov"
+			>
+				<cv:deliverable>CoV DLV19 1.13</cv:deliverable>
+				<cv:jira_validation>IFCCV-499</cv:jira_validation>
+				<cv:cov_version>3.0</cv:cov_version>
+			</cv:ref_example_document>
+			<cv:ref_example_document
+				ref="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52011AG0007&amp;from=EN"
+				header="Position of the Council 52013AG0008"
+				xml_ref="position_52013AG0008/fmx2cov"
+			>
+				<cv:deliverable>CoV DLV19 1.12</cv:deliverable>
+				<cv:jira_validation>IFCCV-498</cv:jira_validation>
+				<cv:cov_version>3.0</cv:cov_version>
+			</cv:ref_example_document>
+			<!-- TODO -->
+			<cv:ref_example_document
+				ref="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32017R0746&amp;from=EN"
+				header="Regulation 32017R0746 (Annex VII)"
+				xml_ref="regulation_32017r0746/fmx2cov"
+			>
+				<cv:deliverable>CoV DLV19 1.2</cv:deliverable>
+				<cv:jira_validation>IFCCV-496</cv:jira_validation>
+				<cv:cov_version>3.0</cv:cov_version>
+			</cv:ref_example_document>
+			<!-- TODO
+			<cv:ref_example_document ref="" header="Annex 320171938" deliverable="???" jira_validation="IFCCV-488" cov_version="3.0"/>
+			-->
+			<!-- TODO -->
+			<cv:ref_example_document
+				ref="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32017R0745&amp;from=EN"
+			 	header="Regulation 32017R0745 (Annex)"
+				xml_ref="regulation_32017R0745/fmx2cov"
+			>
+				<cv:deliverable>CoV DLV19 1.1</cv:deliverable>
+				<cv:jira_validation>IFCCV-487</cv:jira_validation>
+				<cv:cov_version>3.0</cv:cov_version>
+			</cv:ref_example_document>
+			<!-- TODO
+			annexes for (JIRA IFCCV-491, 493, 494).
+			-->
+			<cv:ref_example_document
+				ref="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32017L1564&amp;from=EN"
+				header="Directive 32017L1564"
+				xml_ref="directive_32017l1564/cov"
+			>
+				<cv:deliverable>CoV DLV18 1.16</cv:deliverable>
+				<cv:jira_validation>IFCCV-471</cv:jira_validation>
+				<cv:cov_version>2.1</cv:cov_version>
+			</cv:ref_example_document>
+			<!--
+			<cv:ref_example_document ref="32018D0412" header="Decision 32018D0412"/>
+			-->
+			<!--
+			<cv:ref_example_document ref="32018L0410" header="Directive 32018L0410"/>
+			-->
+			<!--
+			<cv:ref_example_document ref="32018L0411" header="Directive 32018L0411"/>
+			-->
+			<!--
+			<cv:ref_example_document ref="32018R0196" header="Regulation 32018R0196"/>
+			-->
+			<!--
+			<cv:ref_example_document ref="32018R0409" header="Regulation 32018R0409"/>
+			-->
+		</xs:documentation>
+	</xs:annotation>
+</xs:schema>
