@@ -1,4 +1,4 @@
-package eu.europa.publications.ifc.cov.xerces;
+package eu.europa.publications.xml.tools;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -21,7 +21,7 @@ import org.apache.logging.log4j.MarkerManager;
 public final class Main {
 
     /** The name of this LOGGER will be
-    /* "eu.europa.publications.ifc.cov.xerces.XSD11Validator".
+    /* "eu.europa.publications.xml.tools.XSD11Validator".
     */
     private static final Logger LOGGER = LogManager.getLogger();
 

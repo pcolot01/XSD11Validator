@@ -9,4 +9,4 @@
  * @author pcolot
  * @version 1.0
  */
-package eu.europa.publications.ifc.cov.xerces;
+package eu.europa.publications.xml.tools;

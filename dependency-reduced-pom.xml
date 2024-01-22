@@ -32,7 +32,7 @@
                 </transformer>
                 <transformer>
                   <manifestEntries>
-                    <Main-Class>eu.europa.publications.ifc.cov.xerces.Main</Main-Class>
+                    <Main-Class>eu.europa.publications.xml.tools.Main</Main-Class>
                     <Multi-Release>true</Multi-Release>
                   </manifestEntries>
                 </transformer>

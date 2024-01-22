@@ -1,7 +1,7 @@
 /**
  *
  */
-package eu.europa.publications.ifc.cov.xerces;
+package eu.europa.publications.xml.tools;
 
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;

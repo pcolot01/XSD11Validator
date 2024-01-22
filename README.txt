@@ -126,7 +126,7 @@ Usage:
 cd /D D:\OP\_DEV\XSD11Validator
 
 D:\OP\_DEV\XSD11Validator>java -jar target\XSD11Validator-2.0-SNAPSHOT-shaded.jar
-17:09:30.487 [main] ERROR eu.europa.publications.ifc.cov.xerces.Main - Missing required option: i
+17:09:30.487 [main] ERROR eu.europa.publications.xml.tools.Main - Missing required option: i
 usage: XSD11Validator
  -c,--catalog <arg>   OASIS root catalog file path
  -i,--input <arg>     XML input file path
@@ -135,33 +135,33 @@ usage: XSD11Validator
 
 
 D:\OP\_DEV\XSD11Validator>java -jar target\XSD11Validator-2.0-SNAPSHOT-shaded.jar -i .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xml -s .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xsd -c .\src\test\resources\eu\europa\publications\ifc\cov\xerces\catalog.xml
-1. ←[34m11:33:03 eu.europa.publications.ifc.cov.xerces.XSD11Validator:83 XSD 1.1 validation using catalog on File .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xml using schema .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xsd and catalog .\src\main\resources\eu\europa\publications\ifc\cov\xerces\catalog.xml
-←[m2. ←[34m11:33:03 eu.europa.publications.ifc.cov.xerces.Main:110 return Code: 0
+1. ←[34m11:33:03 eu.europa.publications.xml.tools.XSD11Validator:83 XSD 1.1 validation using catalog on File .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xml using schema .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xsd and catalog .\src\main\resources\eu\europa\publications\ifc\cov\xerces\catalog.xml
+←[m2. ←[34m11:33:03 eu.europa.publications.xml.tools.Main:110 return Code: 0
 ←[m
 
 D:\OP\_DEV\XSD11Validator>java  -Dlog4j.configurationFile=./src/test/resources/eu/europa/publications/ifc/cov/xerces/log4j2.xml 
 -jar target\XSD11Validator-2.0-SNAPSHOT-shaded.jar -i .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xml -s .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xsd -c .\src\test\resources\eu\europa\publications\ifc\cov\xerces\catalog.xml
-1. ←[34m11:34:14 eu.europa.publications.ifc.cov.xerces.XSD11Validator:83 XSD 1.1 validation using catalog on File .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xml using schema .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xsd and catalog .\src\test\resources\eu\europa\publications\ifc\cov\xerces\catalog.xml
-←[m2.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:292 XML Catalog Root Dir: D:\OP\_DEV\XSD11Validator\.\src\test\resources\eu\europa\publications\ifc\cov\xerces
-3.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:404 Get XML schema namespace associated to root element
-4.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:407 NamespaceURI : http://ifc.europa.eu/common_vocabulary
-5.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:539 getAbsoluteUriFromRelativeorAbsolute: HTTP: http://ifc.europa.eu/common_vocabulary from http://ifc.europa.eu/common_vocabulary based on: file:///D:/OP/_DEV/XSD11Validator/src/test/resources/eu/europa/publications/ifc/cov/xerces/
-6.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:428 If a namespace is associated to root element Get SchemaLocations
-7.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:433 SchemaLocations Resolution of resPublicId: http://ifc.europa.eu/common_vocabulary using : http://ifc.europa.eu/common_vocabulary ../../../ifc/cov/xerces/xerces-test.xsd
-8.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:444 schemaLocationSystemId: ../../../ifc/cov/xerces/xerces-test.xsd
-9.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:446 getAbsoluteUriFromRelativeorAbsolute resPublicId: ../../../ifc/cov/xerces/xerces-test.xsd using : xmlInputStreamSource.getSystemId())
-10.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:549 getAbsoluteUriFromRelativeorAbsolute: Relative URI: file:/D:/OP/_DEV/XSD11Validator/src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd from ../../../ifc/cov/xerces/xerces-test.xsd based on: file:///D:/OP/_DEV/XSD11Validator/src/test/resources/eu/europa/publications/ifc/cov/xerces/
-11.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:480 Catalog Resolution of resSystemId: ../../../ifc/cov/xerces/xerces-test.xsd using : catalogResolver
-12.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:483 Resolve resSystemId using XMLCatalogResolver: null
-13.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:500 Clean room pattern
-14.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:180 Extracted schema name URL: file:/D:/OP/_DEV/XSD11Validator/src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd
-15.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:189 XSD Schema Absolute Path: file:/D:/OP/_DEV/XSD11Validator/./src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd
-16.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:192 Internal schema name: file:/D:/OP/_DEV/XSD11Validator/src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd differs from schema passed as argument: file:/D:/OP/_DEV/XSD11Validator/./src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd
-17.         11:34:14     eu.europa.publications.ifc.cov.xerces.XSD11Validator:200 Creating schema from file:/D:/OP/_DEV/XSD11Validator/./src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd
-18.         11:34:15     eu.europa.publications.ifc.cov.xerces.XSD11Validator:100 Validate ended without errors
-19.         11:34:15     eu.europa.publications.ifc.cov.xerces.XSD11Validator:104 XML document successfully validated.
-20.         11:34:15     eu.europa.publications.ifc.cov.xerces.XSD11Validator:118 XML document validation finished.
-21. ←[34m11:34:15 eu.europa.publications.ifc.cov.xerces.Main:110 return Code: 0
+1. ←[34m11:34:14 eu.europa.publications.xml.tools.XSD11Validator:83 XSD 1.1 validation using catalog on File .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xml using schema .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xsd and catalog .\src\test\resources\eu\europa\publications\ifc\cov\xerces\catalog.xml
+←[m2.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:292 XML Catalog Root Dir: D:\OP\_DEV\XSD11Validator\.\src\test\resources\eu\europa\publications\ifc\cov\xerces
+3.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:404 Get XML schema namespace associated to root element
+4.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:407 NamespaceURI : http://ifc.europa.eu/common_vocabulary
+5.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:539 getAbsoluteUriFromRelativeorAbsolute: HTTP: http://ifc.europa.eu/common_vocabulary from http://ifc.europa.eu/common_vocabulary based on: file:///D:/OP/_DEV/XSD11Validator/src/test/resources/eu/europa/publications/ifc/cov/xerces/
+6.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:428 If a namespace is associated to root element Get SchemaLocations
+7.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:433 SchemaLocations Resolution of resPublicId: http://ifc.europa.eu/common_vocabulary using : http://ifc.europa.eu/common_vocabulary ../../../ifc/cov/xerces/xerces-test.xsd
+8.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:444 schemaLocationSystemId: ../../../ifc/cov/xerces/xerces-test.xsd
+9.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:446 getAbsoluteUriFromRelativeorAbsolute resPublicId: ../../../ifc/cov/xerces/xerces-test.xsd using : xmlInputStreamSource.getSystemId())
+10.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:549 getAbsoluteUriFromRelativeorAbsolute: Relative URI: file:/D:/OP/_DEV/XSD11Validator/src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd from ../../../ifc/cov/xerces/xerces-test.xsd based on: file:///D:/OP/_DEV/XSD11Validator/src/test/resources/eu/europa/publications/ifc/cov/xerces/
+11.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:480 Catalog Resolution of resSystemId: ../../../ifc/cov/xerces/xerces-test.xsd using : catalogResolver
+12.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:483 Resolve resSystemId using XMLCatalogResolver: null
+13.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:500 Clean room pattern
+14.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:180 Extracted schema name URL: file:/D:/OP/_DEV/XSD11Validator/src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd
+15.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:189 XSD Schema Absolute Path: file:/D:/OP/_DEV/XSD11Validator/./src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd
+16.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:192 Internal schema name: file:/D:/OP/_DEV/XSD11Validator/src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd differs from schema passed as argument: file:/D:/OP/_DEV/XSD11Validator/./src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd
+17.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:200 Creating schema from file:/D:/OP/_DEV/XSD11Validator/./src/test/resources/eu/europa/publications/ifc/cov/xerces/xerces-test.xsd
+18.         11:34:15     eu.europa.publications.xml.tools.XSD11Validator:100 Validate ended without errors
+19.         11:34:15     eu.europa.publications.xml.tools.XSD11Validator:104 XML document successfully validated.
+20.         11:34:15     eu.europa.publications.xml.tools.XSD11Validator:118 XML document validation finished.
+21. ←[34m11:34:15 eu.europa.publications.xml.tools.Main:110 return Code: 0
 
 
 

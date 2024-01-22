@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+
+    <public publicId="-//OpenOffice.org//DTD Modified W3C MathML 1.01//EN" uri="dtd/office_mathml2.dtd"/>
+    <public publicId="-//W3C//DTD MathML 2.0//EN" uri="dtd/mathml2.dtd"/>        
+    <system systemId="mathml2.dtd" uri="dtd/mathml2.dtd"/>
+
+    <system systemId="../../../a/path/to/xerces-test.xsd" uri="file:/C:/Users/Home/Documents/GitHub/XSD11Validator/src/test/resources/eu/europa/publications/xml/testSets/tools/public/schemas/xerces-test.xsd"/>
+    <public publicId="http://mydomain.org/mygrammar" uri="file:/C:/Users/Home/Documents/GitHub/XSD11Validator/src/test/resources/eu/europa/publications/xml/testSets/tools/public/schemas/xerces-test.xsd"/>
+    
+    <rewriteSystem systemIdStartString="http://www.w3.org/Math/DTD/mathml2/" rewritePrefix="dtd/"/>
+    <rewriteSystem systemIdStartString="http://www.w3.org/TR/MathML2/dtd/" rewritePrefix="dtd/"/>
+    
+    <system systemId="mathml2.dtd" uri="dtd/mathml2.dtd"/>
+    <uri name="http://www.w3.org/Math/XMLSchema/mathml2/mathml2.xsd" uri="xsd/mathml2.xsd"/>
+    <system systemId="http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd" uri="dtd/xhtml-math-svg.dtd"/>
+    
+

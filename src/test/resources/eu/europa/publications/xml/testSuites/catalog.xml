@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+
+    <system systemId="w3cXsdtests/nistMeta/AnnotatedTSSchema.xsd" uri="w3cXsdtests/common/xsts.xsd"/>
+	<system systemId="http://www.w3.org/XML/2004/xml-schema-test-suite/" uri="w3cXsdtests/common/xsts.xsd"/>
+	<system systemId="file:/C:/Users/Home/Documents/GitHub/XSD11Validator/src/test/resources/eu/europa/publications/xml/testSets/w3cXsdtests/nistMeta/AnnotatedTSSchema.xsd" uri="w3cXsdtests/common/xsts.xsd"/>
+	<system systemId="file:/C:/Users/Home/Documents/GitHub/XSD11Validator/src/test/resources/eu/europa/publications/xml/testSets/w3cXsdtests/nistMeta/AnnotatedTSSchema.xsd" uri="C:\Users\Home\Documents\GitHub\XSD11Validator\src\test\resources\eu\europa\publications\xml\testSets\w3cXsdtests\common\xsts.xsd"/>	
+    <public publicId="http://www.w3.org/XML/2004/xml-schema-test-suite/" uri="./AnnotatedTSSchema.xsd"/>
+
+	<rewriteSystem systemIdStartString="w3cXsdtests/nistMeta/AnnotatedTSSchema.xsd" rewritePrefix="w3cXsdtests/common/xsts.xsd" />
+	<rewriteURI uriStartString="http://www.w3.org/XML/2004/xml-schema-test-suite/" rewritePrefix="w3cXsdtests/common/xsts.xsd" />
+
+</catalog>

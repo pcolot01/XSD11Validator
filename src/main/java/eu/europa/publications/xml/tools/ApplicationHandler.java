@@ -1,7 +1,7 @@
 /**
  *
  */
-package eu.europa.publications.ifc.cov.xerces;
+package eu.europa.publications.xml.tools;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,7 +20,7 @@ public class ApplicationHandler extends Exception {
     private static final long serialVersionUID = 1L;
 
     /** The name of this LOGGER will be
-    /* "eu.europa.publications.ifc.cov.xerces.ApplicationHandler".
+    /* "eu.europa.publications.xml.tools.ApplicationHandler".
     */
     private static final Logger LOGGER = LogManager.getLogger();
 

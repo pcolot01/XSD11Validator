@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<temp xmlns="http://mydomain.org/mygrammar"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://ifc.europa.eu/common_vocabulary ../../../ifc/cov/xerces/xerces-test.xsd"
+	x="350">
+	<invalidTag 
+		<content></content>
+	</invalidTag>
+</temp>

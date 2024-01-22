@@ -1,0 +1,3 @@
+[submodule "src/test/resources/eu/europa/publications/xml/testSets/w3cXsdtests"]
+	path = src/test/resources/eu/europa/publications/xml/testSets/w3cXsdtests
+	url = https://github.com/w3c/xsdtests

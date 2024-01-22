@@ -1,20 +1,13 @@
-package eu.europa.publications.ifc.cov.xerces;
+package eu.europa.publications.xml.tools;
 
 import java.io.File;
-import java.io.IOException;
-//import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
 import java.net.URISyntaxException;
-//import java.nio.file.Path;
-//import java.nio.file.Paths;
-//import java.util.ArrayList;
-//import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
-//import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -39,7 +32,7 @@ import org.xml.sax.SAXNotSupportedException;
 public final class XSD11Validator {
     
     /** The name of this LOGGER will be
-    /* "eu.europa.publications.ifc.cov.xerces.XSD11Validator".
+    /* "eu.europa.publications.xml.tools.XSD11Validator".
     */
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -267,7 +260,7 @@ public final class XSD11Validator {
             LOGGER.trace(MARKER, "Get internal Xsd URL from XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId());
             LOGGER.trace(MARKER, "  and catalog: " + catalogResolver);
             
-            //2. Get the XML root qualified namespace [TODO add DTD alternative]
+            //2. Get the XML root qualified namespace 
             XMLStreamReader root = getRoot(xmlInputStreamSource);
             
             //3. Get the namespace
@@ -550,7 +543,7 @@ public final class XSD11Validator {
                 throw new ApplicationHandler(e);
             }
         } else {
-            throw new ApplicationHandler("No input to be coverted to URL");
+            throw new ApplicationHandler("No input to be converted to URL");
         }
     }
 
@@ -584,21 +577,27 @@ public final class XSD11Validator {
 }
 
 
-//@TODO Remove eu / cov reference from code package
-//@TODO Anonymize tests
-//@TODO Refactorize to check schema
-//@TODO Refactorize to support DTD
-//@TODO Refactorize to reduce God Class (split in classes)
-//@TODO Add table of combinatory tests
-//@TODO Manage referred catalog in sub-directory
-//@TODO Add DTD system identifier tests in Test Suite 
-//@TODO Add DTD public identifier tests in Test Suite 
-//@TODO Add noNamespaceSchemaLocation tests in Test Suite
-//@TODO Add namespaceSchemaLocation test without used NS in Test Suite
-//@TODO Add test with absolute references for xml input, xml schema, xml catalog
-//@TODO Add test with absolute references in catalog for xml schema, xml catalog
-//@TODO Add use XSD1.1 test suite example
-//@TODO Add http ref test
+// TODO Anonymize tests
+// TODO Refactorize to check schema
+// TODO Refactorize to support DTD
+// TODO Refactorize to reduce God Class (split in classes)
+// TODO Add table of combinatory tests
+// TODO Manage referred catalog in sub-directory
+// TODO Add DTD system identifier tests in Test Suite 
+// TODO Add DTD public identifier tests in Test Suite 
+// TODO Add noNamespaceSchemaLocation tests in Test Suite
+// TODO Add namespaceSchemaLocation test without used NS in Test Suite
+// TODO Add test with absolute references for xml input, xml schema, xml catalog
+// TODO Add test with absolute references in catalog for xml schema, xml catalog
+// TODO Add use XSD1.1 test suite example
+// TODO Add http ref test
+// TODO Add system and relative catalog resolutions
+// TODO Add validation using default NS (no pre and NS)
+
+// generate test classes for private, public and w3tests
+// TODO replace in catalog file:/C:/Users/Home/Documents/GitHub/XSD11Validator by actual location
+// TODO ad catalog for w3tests
+// TODO Add schema validation and catalog validation feature in add to instances
 
 
 
