@@ -222,9 +222,13 @@ public final class XSD11Validator {
         
         if (xsdInput == null) {
          // 3. Without forced schema used the resolved internal one
+            if (internalSchemaNameURL != null) {
             URL xsdInputURL = internalSchemaNameURL;
             
             return xsdInputURL;
+            } else {
+                throw new ApplicationHandler("Neither a nonamspace nor a namspace is attached to the root nor a default no namespace location is provided");
+            }
         } else {
             // 4. Unless used the forced schema
             try {
@@ -232,7 +236,7 @@ public final class XSD11Validator {
                 LOGGER.trace(MARKER, "XSD Schema Absolute Path: " + xsdInputURL);
                 
                 // check forced schema is equal to internal format unless warn
-                if (!xsdInputURL.toURI().equals(internalSchemaNameURL.toURI())) {
+                if ((internalSchemaNameURL != null) && (!xsdInputURL.toURI().equals(internalSchemaNameURL.toURI()))) {
                     LOGGER.warn(MARKER, "Internal schema name: "
                             + internalSchemaNameURL
                             + " differs from schema passed as argument: "
@@ -285,7 +289,7 @@ public final class XSD11Validator {
                 if (namespaceURI != null) {
                     LOGGER.trace(MARKER, "noNamespaceSchemaLocation is " + namespaceURI);
                 } else {
-                    throw new ApplicationHandler("Neither a namspace is attached to the root nor a default no namespace location is provided");
+                    // namespace is null if #defaultNameSpace has to be used
                 }
                 
             } else {
@@ -319,31 +323,36 @@ public final class XSD11Validator {
             // Release XMLStreamReader resources
             root.close();
             
-            //4. Resolve namespaceURI against catalog Public, System, Relative to XMLInput
-            LOGGER.trace(MARKER, "Resolve URI " + namespaceURI + " against catalog Public, System, Relative to XMLInput");
-            
-            String resolvedId = catalogResolver.resolvePublic(namespaceURI, null);
-            if (resolvedId == null) {
-                LOGGER.trace(MARKER, "Failed Resolving of URI " + namespaceURI + " against Public catalog");
+            // if any namespace is defined try to resolved it
+            if (namespaceURI != null) {
+                //4. Resolve namespaceURI against catalog Public, System, Relative to XMLInput
+                LOGGER.trace(MARKER, "Resolve URI " + namespaceURI + " against catalog Public, System, Relative to XMLInput");
                 
-                resolvedId = catalogResolver.resolveSystem(namespaceURI);
+                String resolvedId = catalogResolver.resolvePublic(namespaceURI, null);
                 if (resolvedId == null) {
-                    LOGGER.trace(MARKER, "Failed Resolving of URI " + namespaceURI + " against System catalog");
+                    LOGGER.trace(MARKER, "Failed Resolving of URI " + namespaceURI + " against Public catalog");
                     
-                    resolvedId = resolveRelativePath(xmlInputStreamSource.getSystemId(), namespaceURI);
+                    resolvedId = catalogResolver.resolveSystem(namespaceURI);
                     if (resolvedId == null) {
-                        LOGGER.trace(MARKER, "Failed Resolving of URI " + namespaceURI + " relative to XMLInput");
-                        resolvedId = namespaceURI;
+                        LOGGER.trace(MARKER, "Failed Resolving of URI " + namespaceURI + " against System catalog");
+                        
+                        resolvedId = resolveRelativePath(xmlInputStreamSource.getSystemId(), namespaceURI);
+                        if (resolvedId == null) {
+                            LOGGER.trace(MARKER, "Failed Resolving of URI " + namespaceURI + " relative to XMLInput");
+                            resolvedId = namespaceURI;
+                        } else {
+                            LOGGER.trace(MARKER, "Successful Resolving of URI " + namespaceURI + " relative to XMLInput as " + resolvedId);                
+                        }
                     } else {
-                        LOGGER.trace(MARKER, "Successful Resolving of URI " + namespaceURI + " relative to XMLInput as " + resolvedId);                
+                        LOGGER.trace(MARKER, "Successful Resolving of URI " + namespaceURI + " against System catalog as " + resolvedId);                
                     }
                 } else {
-                    LOGGER.trace(MARKER, "Successful Resolving of URI " + namespaceURI + " against System catalog as " + resolvedId);                
+                    LOGGER.trace(MARKER, "Successful Resolving of URI " + namespaceURI + " against Public catalog as " + resolvedId);                
                 }
+                return getURL(resolvedId);                
             } else {
-                LOGGER.trace(MARKER, "Successful Resolving of URI " + namespaceURI + " against Public catalog as " + resolvedId);                
+                return null;
             }
-            return getURL(resolvedId);
         } catch ( ApplicationHandler a) {
             throw a;
         } catch ( Exception e) {
@@ -603,7 +612,8 @@ public final class XSD11Validator {
 // TODO replace in catalog file:/C:/Users/Home/Documents/GitHub/XSD11Validator by actual location
 // TODO Add schema validation and catalog validation feature in add to instances
 // TODO split NIST 160,000 in four
-
+// TODO support NS=urn:... 
+// TODO support check good schema if correct target NS and not file name
 
 ////DTD
 //// 6. Get DTD systemID
