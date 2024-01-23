@@ -52,7 +52,7 @@ public class ApplicationHandler extends Exception {
      */
     public ApplicationHandler(final String message) {
         super(message);
-        this.printStackTrace();
+        //this.printStackTrace();
         incrementErrorCount();
         LOGGER.error(MARKER, message);
     }
@@ -127,6 +127,16 @@ public class ApplicationHandler extends Exception {
         LOGGER.warn(MARKER, exception.getMessage());
     }
 
+
+    /** Warn about an exception.
+     *
+     * @param message The provided message
+
+     */
+    public static void warn(final String message) {
+        LOGGER.warn(MARKER, message);
+    }
+    
     /**Error about an exception.
      *
      * @param exception The provided exception
@@ -135,6 +145,15 @@ public class ApplicationHandler extends Exception {
         incrementErrorCount();
         LOGGER.error(MARKER, exception.getMessage());
     }
+    
+    /**Error about an exception.
+    *
+    * @param message The provided message
+    */
+   public static void error(final String message) {
+       incrementErrorCount();
+       LOGGER.error(MARKER, message);
+   }
 
     /** Fatal about an exception.
      *
@@ -145,4 +164,12 @@ public class ApplicationHandler extends Exception {
         LOGGER.fatal(MARKER, exception.getMessage());
     }
 
+    /** Fatal about an exception.
+    *
+    * @param message The provided message
+    */
+   public static void fatal(final String message) {
+       incrementErrorCount();
+       LOGGER.fatal(MARKER, message);
+   }
 }

@@ -12,7 +12,7 @@
     
     <xsl:output indent="no" encoding="UTF-8" method="text"/>
     
-    <xsl:param name="generationDirectory" select="'file:/C:/Users/Home/Documents/GitHub/XSD11Validator/src/test/generated/'"/>
+    <xsl:param name="generationDirectory" select="'file:/C:/Users/Home/Documents/GitHub/XSD11Validator/target/generated-test-sources/java/'"/>
     <xsl:param name="relativePath" select="replace(local:basePath(base-uri()), '^.*/testSuites/', '')"/>
     <xsl:param name="modulePath" select="'eu/europa/publications/xml/'"/>
     <xsl:param name="moduleName" select="'eu.europa.publications.xml'"/>

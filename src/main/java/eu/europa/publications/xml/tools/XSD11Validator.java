@@ -168,6 +168,13 @@ public final class XSD11Validator {
         // 2. Create a schema factory for XML 1.1
         SchemaFactory schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1");
         schemaFactory.setFeature("http://apache.org/xml/features/validation/cta-full-xpath-checking", true);
+        
+        //handle multiple files with same targetnamespace
+        schemaFactory.setFeature("http://apache.org/xml/features/honour-all-schemaLocations", true);
+        
+        // associate the schema factory with the resource resolver, which is responsible for resolving the imported XSD's
+        //schemaFactory.setResourceResolver(new ResourceResolver());
+
 
         // 3. Get schema name
         URL xsdInputURL = getXsdURL(xsdInput, xmlInputStreamSource, catalogResolver);
@@ -179,10 +186,10 @@ public final class XSD11Validator {
             try {
                 schema = schemaFactory.newSchema(xsdInputURL);
             } catch (Exception e) {
-                throw new ApplicationHandler(e);
+                ApplicationHandler.error(e);
             }
         } else {
-            throw new ApplicationHandler("No schema detected");
+            ApplicationHandler.error("No schema detected");
         }
         
         return schema;
@@ -350,7 +357,7 @@ public final class XSD11Validator {
      * @param xmlInput
      * @throws ApplicationHandler
      */
-    private static StreamSource getXmlInputStream(final String xmlInput)
+    public static StreamSource getXmlInputStream(final String xmlInput)
             throws ApplicationHandler {
         
         // 1. Get the XML Stream
@@ -415,7 +422,7 @@ public final class XSD11Validator {
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(xmlInputStreamSource);
             
             // 4. XML Stream has content
-            if (xmlStreamReader.hasNext()) {
+            while (xmlStreamReader.hasNext()) {
         
                 // 4. Get first XML content
                 xmlStreamReader.next();
@@ -427,12 +434,10 @@ public final class XSD11Validator {
                     LOGGER.trace(MARKER, "Get root element");
                     
                     return xmlStreamReader;
-                } else {
-                    throw new ApplicationHandler("XML input is not starting with an element");
-                }
-            }  else {
-                throw new ApplicationHandler("XML input is not a XML content");
-            }
+                } 
+            }  
+            throw new ApplicationHandler("XML input is not a XML content");
+            
         } catch ( ApplicationHandler a) {
             throw a;
         } catch (Exception e) {
@@ -594,11 +599,10 @@ public final class XSD11Validator {
 // TODO Add system and relative catalog resolutions
 // TODO Add validation using default NS (no pre and NS)
 
-// generate test classes for private, public and w3tests
-// TODO replace in catalog file:/C:/Users/Home/Documents/GitHub/XSD11Validator by actual location
-// TODO ad catalog for w3tests
-// TODO Add schema validation and catalog validation feature in add to instances
 
+// TODO replace in catalog file:/C:/Users/Home/Documents/GitHub/XSD11Validator by actual location
+// TODO Add schema validation and catalog validation feature in add to instances
+// TODO split NIST 160,000 in four
 
 
 ////DTD
