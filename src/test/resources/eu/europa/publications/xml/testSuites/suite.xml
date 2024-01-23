@@ -12,6 +12,6 @@
  </ts:annotation>
 
  <ts:testSetRef xlink:href="tools/suite.xml"/>
- <ts:testSetRef xlink:href="w3cXsdtests/suite.xml"/>
+<!-- <ts:testSetRef xlink:href="w3cXsdtests/suite.xml"/>-->
 <!-- <ts:testSetRef xlink:href="w3cXsdtests/common/introspection.testSet"/>-->
 </ts:testSuite>

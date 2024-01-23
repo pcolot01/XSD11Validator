@@ -6,13 +6,13 @@
 	xmlns:ts="http://www.w3.org/XML/2004/xml-schema-test-suite/" 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:local="http://local"
-    xsi:schemaLocation="http://www.w3.org/XML/2004/xml-schema-test-suite/ ../resources/eu/europa/publications/xml/testSets/w3cXsdtests/common/xsts.xsd" 
+    xsi:schemaLocation="http://www.w3.org/XML/2004/xml-schema-test-suite/ ../resources/eu/europa/publications/xml/common/xsts.xsd" 
     exclude-result-prefixes="xs"
     version="2.0">
     
     <xsl:output indent="no" encoding="UTF-8" method="text"/>
     
-    <xsl:param name="generationDirectory" select="'file:/C:/Users/Home/Documents/GitHub/XSD11Validator/target/generated-test-sources/java/'"/>
+    <xsl:param name="generationDirectory" select="replace(local:basePath(base-uri(document(''))), '/src/.*$', '/target/generated-test-sources/java/')"/>
     <xsl:param name="relativePath" select="replace(local:basePath(base-uri()), '^.*/testSuites/', '')"/>
     <xsl:param name="modulePath" select="'eu/europa/publications/xml/'"/>
     <xsl:param name="moduleName" select="'eu.europa.publications.xml'"/>

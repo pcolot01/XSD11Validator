@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+	
+	<system systemId="http://www.w3.org/2001/xml.xsd" uri="xml.xsd"/>
+    <public publicId="http://www.w3.org/2001/xml.xsd" uri="xml.xsd"/>
+	<rewriteURI uriStartString="http://www.w3.org/2001/xml.xsd" rewritePrefix="xml.xsd" />
+	
+	<system systemId="http://www.w3.org/XML/2008/06/xlink.xsd" uri="xlink.xsd"/>
+    <public publicId="http://www.w3.org/XML/2008/06/xlink.xsd" uri="xlink.xsd"/>
+	<rewriteURI uriStartString="http://www.w3.org/XML/2008/06/xlink.xsd" rewritePrefix="xlink.xsd" />
+	
+    <system systemId="w3cXsdtests/nistMeta/AnnotatedTSSchema.xsd" uri="xsts.xsd"/>
+    <public publicId="w3cXsdtests/nistMeta/AnnotatedTSSchema.xsd" uri="xsts.xsd"/>
+	<rewriteSystem systemIdStartString="w3cXsdtests/nistMeta/AnnotatedTSSchema.xsd" rewritePrefix="xsts.xsd" />
+	
+	<system systemId="http://www.w3.org/XML/2004/xml-schema-test-suite/" uri="xsts.xsd"/>
+    <public publicId="http://www.w3.org/XML/2004/xml-schema-test-suite/" uri="xsts.xsd"/>
+	<rewriteURI uriStartString="http://www.w3.org/XML/2004/xml-schema-test-suite/" rewritePrefix="xsts.xsd" />
+
+</catalog>

@@ -5,9 +5,9 @@
     <public publicId="-//W3C//DTD MathML 2.0//EN" uri="dtd/mathml2.dtd"/>        
     <system systemId="mathml2.dtd" uri="dtd/mathml2.dtd"/>
 
-    <system systemId="../../../a/path/to/xerces-test.xsd" uri="file:/C:/Users/Home/Documents/GitHub/XSD11Validator/src/test/resources/eu/europa/publications/xml/testSets/tools/public/schemas/xerces-test.xsd"/>
-    <public publicId="http://mydomain.org/mygrammar" uri="file:/C:/Users/Home/Documents/GitHub/XSD11Validator/src/test/resources/eu/europa/publications/xml/testSets/tools/public/schemas/xerces-test.xsd"/>
-    
+    <system systemId="../../../a/path/to/xerces-test.xsd" uri="file:../schemas/xerces-test.xsd"/>
+    <public publicId="http://mydomain.org/mygrammar" uri="file:../schemas/xerces-test.xsd"/>
+        
     <rewriteSystem systemIdStartString="http://www.w3.org/Math/DTD/mathml2/" rewritePrefix="dtd/"/>
     <rewriteSystem systemIdStartString="http://www.w3.org/TR/MathML2/dtd/" rewritePrefix="dtd/"/>
     

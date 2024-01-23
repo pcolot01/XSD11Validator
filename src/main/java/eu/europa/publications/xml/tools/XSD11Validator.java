@@ -591,29 +591,42 @@ public final class XSD11Validator {
 }
 
 
-// TODO Anonymize tests
-// TODO Refactorize to check schema
-// TODO Refactorize to support DTD
-// TODO Refactorize to reduce God Class (split in classes)
-// TODO Add table of combinatory tests
-// TODO Manage referred catalog in sub-directory
-// TODO Add DTD system identifier tests in Test Suite 
-// TODO Add DTD public identifier tests in Test Suite 
-// TODO Add noNamespaceSchemaLocation tests in Test Suite
-// TODO Add namespaceSchemaLocation test without used NS in Test Suite
-// TODO Add test with absolute references for xml input, xml schema, xml catalog
-// TODO Add test with absolute references in catalog for xml schema, xml catalog
-// TODO Add use XSD1.1 test suite example
-// TODO Add http ref test
-// TODO Add system and relative catalog resolutions
-// TODO Add validation using default NS (no pre and NS)
+// Develop testsuite to:
+//TODO... Add table of combinatory tests
+//TODO... Manage referred catalog in sub-directory
+//TODO... Add noNamespaceSchemaLocation tests in Test Suite
+//TODO... Add namespaceSchemaLocation test without used NS in Test Suite
+//TODO... Add validation using default NS (no pre and NS)
+//TODO... Add http ref test
+//TODO... Add public/system and asbolute/relative catalog resolutions for schema
+//TODO... Add use XSD1.1 test suite example
 
 
-// TODO replace in catalog file:/C:/Users/Home/Documents/GitHub/XSD11Validator by actual location
-// TODO Add schema validation and catalog validation feature in add to instances
-// TODO split NIST 160,000 in four
-// TODO support NS=urn:... 
-// TODO support check good schema if correct target NS and not file name
+// Modify code generator to filter test resources
+//TODO split NIST 160,000 in fourty
+//TODO Add test with absolute references for xml input, xml schema, xml catalog
+//TODO Add test with absolute references in catalog for xml schema, xml catalog
+
+
+// Extend dev to support:
+//TODO support NS=urn:... 
+//TODO support check good schema if correct target NS and not file name
+//TODO cache sub schema using catalog
+
+//TODO Refactorize to check schema
+//TODO Refactorize to check catalog
+
+//TODO Refactorize to reduce God Class (split in classes)
+
+// Documentation
+//How to use versioning
+
+// Improvements for cat backward compatibility:
+//TODO Refactorize to support DTD
+//TODO Add DTD system identifier tests in Test Suite 
+//TODO Add DTD public identifier tests in Test Suite
+
+
 
 ////DTD
 //// 6. Get DTD systemID
