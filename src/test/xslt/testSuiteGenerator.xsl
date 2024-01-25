@@ -315,11 +315,17 @@ class </xsl:text><xsl:value-of select="replace(concat(@name, 'Tests'), '-|\.', '
             <xsl:when test="empty($path) or ($path eq 'null()')">
                 <xsl:text>null</xsl:text>
             </xsl:when>
-            <xsl:when test="matches($path,'^\./')">
-                <xsl:text>"</xsl:text><xsl:value-of select="concat($dataDir, $relativePath, replace($path, '^\./', ''))"/><xsl:text>"</xsl:text>
+            <xsl:when test="matches($path,'^(file:)?\./')">
+                <xsl:text>"</xsl:text><xsl:value-of select="concat($dataDir, $relativePath, replace($path, '^(file:)?\./', ''))"/><xsl:text>"</xsl:text>
             </xsl:when>
-            <xsl:when test="matches($path,'^\.\./')">
-                <xsl:text>"</xsl:text><xsl:value-of select="concat($dataDir, local:basePath(replace($relativePath, '/$', '')), replace($path, '^\.\./', ''))"/><xsl:text>"</xsl:text>
+            <xsl:when test="matches($path,'^(file:)?\.\./')">
+                <xsl:text>"</xsl:text><xsl:value-of select="concat($dataDir, local:basePath(replace($relativePath, '/$', '')), replace($path, '^(file:)?\.\./', ''))"/><xsl:text>"</xsl:text>
+            </xsl:when>
+            <xsl:when test="matches($path,'^(file:)?/')">
+                <xsl:text>"</xsl:text><xsl:value-of select="$path"/><xsl:text>"</xsl:text>
+            </xsl:when>
+            <xsl:when test="matches($path,'^(https?:)?/')">
+                <xsl:text>"</xsl:text><xsl:value-of select="$path"/><xsl:text>"</xsl:text>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:text>"</xsl:text><xsl:value-of select="concat($dataDir, $relativePath, $path)"/><xsl:text>"</xsl:text>

@@ -320,6 +320,17 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 			    <configuration>
+					<argLine>
+						-Dhttps.proxyHost=${env.HTTPS.PROXYHOST}
+						-Dhttps.proxyPort=${env.HTTPS.PROXYPORT}
+						-Dhttp.proxyHost=${env.HTTP.PROXYHOST}
+						-Dhttp.proxyPort=${env.HTTP.PROXYPORT}
+						-Dhttp.nonProxyHosts='${env.HTTP.NONPROXYHOSTS}'
+						-Dhttp.proxyUser=${env.HTTP.PROXYUSER}
+						-Dhttp.proxyPassword=${env.HTTP.PROXYPASSWORD}
+						-Djdk.http.auth.tunneling.disabledSchemes=${env.JDK.HTTP.AUTH.TUNNELING.DISABLEDSCHEMES}
+						-Djdk.https.auth.tunneling.disabledSchemes=${env.JDK.HTTPS.AUTH.TUNNELING.DISABLEDSCHEMES}
+					</argLine>
 			        <excludes>
 			            <exclude>**/__selectionPattern__.java</exclude>
 			        </excludes>

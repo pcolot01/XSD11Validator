@@ -3,6 +3,7 @@ package eu.europa.publications.xml.tools;
 import java.io.File;
 import java.net.URL;
 import java.net.URI;
+import java.net.Authenticator;
 import java.net.URISyntaxException;
 
 import javax.xml.namespace.QName;
@@ -20,7 +21,6 @@ import org.apache.xerces.util.XMLCatalogResolver;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
-
 
 /**
  * XSD 1.1 validation main class.
@@ -49,7 +49,25 @@ public final class XSD11Validator {
      *
      */
     public XSD11Validator() {
-     // This constructor is intentionally empty. Nothing special is needed here.
+        
+        final String proxyHttp = System.getProperty("http.proxyHost");
+        final String proxyHttps = System.getProperty("https.proxyHost");
+        final String user = System.getProperty("http.proxyUser");
+        final String password = System.getProperty("http.proxyPassword");
+        
+        
+        if ((proxyHttp != null) || (proxyHttps != null)) {
+            if ((user != null) && (password != null)) {
+                LOGGER.trace(MARKER, "Setting up proxy configuration with authentification");
+                // Proxy with required authentification
+                Authenticator.setDefault(new ProxyAuthenticator(user, password));
+            } else {
+                LOGGER.trace(MARKER, "Setting up proxy configuration without authentification");
+                // Proxy without required authentification
+            }
+        } else {
+            // No proxy configured
+        }
     }
 
     /**
@@ -63,7 +81,7 @@ public final class XSD11Validator {
      * @param xmlInput the optional XML source  
      * @param xsdInput the optional XML schema 
      * @param catalogFileName the optional OASIS catalog 
-     * @return the integer return code 0: successful >0: failed with number of
+     * @return The integer return code 0: successful >0: failed with number of
      * errors
      *
      * @since 1.0
@@ -72,7 +90,9 @@ public final class XSD11Validator {
      */
     public int validateFile(final String xmlInput, final String xsdInput,
             final String catalogFileName) {
+        
 
+        
         // 1. Logging using Log4j2
         LOGGER.info(MARKER,
                     "XSD 1.1 validation using catalog on File " + xmlInput
@@ -110,8 +130,8 @@ public final class XSD11Validator {
      * @param xsdInput
      * @param catalogFileName
      * @param xmlInputStreamSource
-     * @return
-     * @throws ApplicationHandler
+     * @return The Validator
+     * @throws ApplicationHandler The application exception handler
      * @throws SAXNotRecognizedException
      * @throws SAXNotSupportedException
      */
@@ -149,8 +169,8 @@ public final class XSD11Validator {
      * @param xsdInput
      * @param xmlInputStreamSource
      * @param catalogResolver
-     * @return
-     * @throws ApplicationHandler
+     * @return The Schema
+     * @throws ApplicationHandler The application exception handler
      * @throws SAXNotRecognizedException
      * @throws SAXNotSupportedException
      */
@@ -200,8 +220,8 @@ public final class XSD11Validator {
      * @param xsdInput
      * @param xmlInputStreamSource
      * @param catalogResolver
-     * @return
-     * @throws ApplicationHandler
+     * @return The URL
+     * @throws ApplicationHandler The application exception handler
      * @throws SAXNotRecognizedException
      * @throws SAXNotSupportedException
      */
@@ -258,8 +278,8 @@ public final class XSD11Validator {
      * @param xsdInput
      * @param xmlInputStreamSource
      * @param catalogResolver
-     * @return
-     * @throws ApplicationHandler
+     * @return The URL
+     * @throws ApplicationHandler The application exception handler
      * @throws SAXNotRecognizedException
      * @throws SAXNotSupportedException
      */
@@ -363,8 +383,9 @@ public final class XSD11Validator {
     
     /** Get XML input stream. 
      * 
-     * @param xmlInput
-     * @throws ApplicationHandler
+     * @param xmlInput The URL of the XML input 
+     * @throws ApplicationHandler The application exception handler
+     * @return The Stream Source
      */
     public static StreamSource getXmlInputStream(final String xmlInput)
             throws ApplicationHandler {
@@ -394,7 +415,7 @@ public final class XSD11Validator {
      * 
      * @param catalogFileName
      * @param catalogResolver
-     * @return
+     * @return The Catalog Resolver
      */
     private static XMLCatalogResolver getCatalogResolver(final String catalogFileName) {
         XMLCatalogResolver catalogResolver = new XMLCatalogResolver();
@@ -415,8 +436,8 @@ public final class XSD11Validator {
     /** Get Root Qualified Name.
      * 
      * @param xmlInputStreamSource
-     * @return
-     * @throws ApplicationHandler
+     * @return The XML Stream Reader on the root element
+     * @throws ApplicationHandler The application exception handler
      */
     private static XMLStreamReader getRoot(
             StreamSource xmlInputStreamSource) throws ApplicationHandler {
@@ -461,6 +482,7 @@ public final class XSD11Validator {
      * @param basePathOrURL The base path of the file or of the URL
      * @param relativePath The relative path of the file or of the URL
      * @return The resolved path
+     * @throws ApplicationHandler The application exception handler 
      */
     public static String resolveRelativePath(String basePathOrURL, String relativePath) 
             throws ApplicationHandler {
@@ -502,7 +524,7 @@ public final class XSD11Validator {
      * 
      * @param filePathOrURL Filename or URL to extract the path
      * @return The path
-     * @throws ApplicationHandler The generated error
+     * @throws ApplicationHandler The application exception handler
      */
     public static String getBasePath(String filePathOrURL)
             throws ApplicationHandler {
@@ -531,7 +553,7 @@ public final class XSD11Validator {
      * 
      * @param filePathOrURL Filename or URL to extract the URL
      * @return The URL
-     * @throws ApplicationHandler
+     * @throws ApplicationHandler The application exception handler
      */
     private static URL getURL(final String filePathOrURL)
             throws ApplicationHandler {
@@ -590,16 +612,17 @@ public final class XSD11Validator {
 
 }
 
+//TODO test for http ressources and add java authentification
 
 // Develop testsuite to:
-//TODO... Add table of combinatory tests
-//TODO... Manage referred catalog in sub-directory
-//TODO... Add noNamespaceSchemaLocation tests in Test Suite
-//TODO... Add namespaceSchemaLocation test without used NS in Test Suite
-//TODO... Add validation using default NS (no pre and NS)
-//TODO... Add http ref test
-//TODO... Add public/system and asbolute/relative catalog resolutions for schema
-//TODO... Add use XSD1.1 test suite example
+//TODO ... Add table of combinatory tests
+//TODO ... Manage referred catalog in sub-directory
+//TODO ... Add noNamespaceSchemaLocation tests in Test Suite
+//TODO ... Add namespaceSchemaLocation test without used NS in Test Suite
+//TODO ... Add validation using default NS (no pre and NS)
+//TODO ... Add http ref test
+//TODO ... Add public/system and asbolute/relative catalog resolutions for schema
+//TODO ... Add use XSD1.1 test suite example
 
 
 // Modify code generator to filter test resources

@@ -41,5 +41,34 @@
             <current status="accepted" date="2024-01-20"/>
         </instanceTest>
     </testGroup>
+
+    <testGroup name="SuccesfulHttpThruProxy" description="Successful validation of remote Http xml file obtainied thru authenticated proxy" version="1.1">
+        <annotation>
+            <documentation>
+                <Title>Simple title</Title>
+                <Description>Simple test</Description>
+            </documentation>
+        </annotation>
+        <catalogTest name="catalog.xml">
+            <catalogDocument xlink:href="null()"/>
+            <expected validity="invalid"/>
+            <current status="accepted" date="2024-01-20"/>
+        </catalogTest>
+        <schemaTest name="xerces-test.xsd">
+            <schemaDocument xlink:href="null()"/>
+            <expected validity="invalid"/>
+            <current status="accepted" date="2024-01-20"/>
+        </schemaTest>
+        <instanceTest name="ipo_1.xml">
+		        <annotation>
+		            <documentation>
+		                Successful validation of remote Http xml file obtainied thru authenticated proxy.
+		            </documentation>
+		        </annotation>
+            <instanceDocument xlink:href="https://raw.githubusercontent.com/w3c/xsdtests/master/boeingData/ipo1/ipo_1.xml"/>
+            <expected validity="valid" withCode="0"/>
+            <current status="accepted" date="2024-01-20"/>
+        </instanceTest>
+    </testGroup>
         
 </testSet>  
