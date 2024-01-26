@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<testSet 
+      name="XSD11Validator"
+      description="XSD 1.1 validation test"
+      xmlns="http://www.w3.org/XML/2004/xml-schema-test-suite/"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/XML/2004/xml-schema-test-suite/ ../../../common/xsts.xsd"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      contributor="Publications Office"
+      version="1.1"
+      >
+
+    <testGroup name="failedNoParameters" description="Failed handled Errors" version="1.1">
+        <annotation>
+            <documentation>
+                <Title>Simple title</Title>
+                <Description>Simple test</Description>
+            </documentation>
+        </annotation>
+        <catalogTest name="catalog.xml">
+            <catalogDocument xlink:href="null()"/>
+            <expected validity="valid"/>
+            <current status="accepted" date="2024-01-20"/>
+        </catalogTest>
+        <schemaTest name="xerces-test.xsd">
+            <schemaDocument xlink:href="null()"/>
+            <expected validity="valid"/>
+            <current status="accepted" date="2024-01-20"/>
+        </schemaTest>
+        <instanceTest name="xerces-test.xml">
+		        <annotation>
+		            <documentation>
+		                Invalid, Test failing due to lack of parameters.
+		            </documentation>
+		        </annotation>
+            <instanceDocument xlink:href="null()"/>
+            <expected validity="invalid" withCode="1"/>
+            <current status="accepted" date="2024-01-20"/>
+        </instanceTest>
+    </testGroup>
+        
+</testSet>  
