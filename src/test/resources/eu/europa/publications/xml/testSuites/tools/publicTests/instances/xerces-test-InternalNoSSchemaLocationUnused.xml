@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pre:temp xmlns:pre="http://mydomain.org/mygrammar"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://ifc.europa.eu/other_vocabulary ../../../ifc/cov/xerces/xerces-test2.xsd"
+	
+	x="350"/>

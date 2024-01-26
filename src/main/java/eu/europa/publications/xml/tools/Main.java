@@ -80,7 +80,7 @@ public final class Main {
         int returnCode = 1;
         final Options options = new Options();
         final HelpFormatter formatter = new HelpFormatter();
-
+        
         try {
             final Option input = new Option("i", "input", true, "XML input file path");
             input.setRequired(true);

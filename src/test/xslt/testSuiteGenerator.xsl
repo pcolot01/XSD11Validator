@@ -6,13 +6,13 @@
 	xmlns:ts="http://www.w3.org/XML/2004/xml-schema-test-suite/" 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:local="http://local"
-    xsi:schemaLocation="http://www.w3.org/XML/2004/xml-schema-test-suite/ ../resources/eu/europa/publications/xml/testSets/w3cXsdtests/common/xsts.xsd" 
+    xsi:schemaLocation="http://www.w3.org/XML/2004/xml-schema-test-suite/ ../resources/eu/europa/publications/xml/common/xsts.xsd" 
     exclude-result-prefixes="xs"
     version="2.0">
     
     <xsl:output indent="no" encoding="UTF-8" method="text"/>
     
-    <xsl:param name="generationDirectory" select="'file:/C:/Users/Home/Documents/GitHub/XSD11Validator/target/generated-test-sources/java/'"/>
+    <xsl:param name="generationDirectory" select="replace(local:basePath(base-uri(document(''))), '/src/.*$', '/target/generated-test-sources/java/')"/>
     <xsl:param name="relativePath" select="replace(local:basePath(base-uri()), '^.*/testSuites/', '')"/>
     <xsl:param name="modulePath" select="'eu/europa/publications/xml/'"/>
     <xsl:param name="moduleName" select="'eu.europa.publications.xml'"/>
@@ -315,11 +315,17 @@ class </xsl:text><xsl:value-of select="replace(concat(@name, 'Tests'), '-|\.', '
             <xsl:when test="empty($path) or ($path eq 'null()')">
                 <xsl:text>null</xsl:text>
             </xsl:when>
-            <xsl:when test="matches($path,'^\./')">
-                <xsl:text>"</xsl:text><xsl:value-of select="concat($dataDir, $relativePath, replace($path, '^\./', ''))"/><xsl:text>"</xsl:text>
+            <xsl:when test="matches($path,'^(file:)?\./')">
+                <xsl:text>"</xsl:text><xsl:value-of select="concat($dataDir, $relativePath, replace($path, '^(file:)?\./', ''))"/><xsl:text>"</xsl:text>
             </xsl:when>
-            <xsl:when test="matches($path,'^\.\./')">
-                <xsl:text>"</xsl:text><xsl:value-of select="concat($dataDir, local:basePath(replace($relativePath, '/$', '')), replace($path, '^\.\./', ''))"/><xsl:text>"</xsl:text>
+            <xsl:when test="matches($path,'^(file:)?\.\./')">
+                <xsl:text>"</xsl:text><xsl:value-of select="concat($dataDir, local:basePath(replace($relativePath, '/$', '')), replace($path, '^(file:)?\.\./', ''))"/><xsl:text>"</xsl:text>
+            </xsl:when>
+            <xsl:when test="matches($path,'^(file:)?/')">
+                <xsl:text>"</xsl:text><xsl:value-of select="$path"/><xsl:text>"</xsl:text>
+            </xsl:when>
+            <xsl:when test="matches($path,'^(https?:)?/')">
+                <xsl:text>"</xsl:text><xsl:value-of select="$path"/><xsl:text>"</xsl:text>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:text>"</xsl:text><xsl:value-of select="concat($dataDir, $relativePath, $path)"/><xsl:text>"</xsl:text>

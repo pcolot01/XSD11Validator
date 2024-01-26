@@ -170,13 +170,16 @@
 		              <stylesheet>src/test/xslt/testSuiteGenerator.xsl</stylesheet>
 		            </transformationSet>
 		          </transformationSets>
+		          <catalogs>
+		            <catalog>src/test/resources/eu/europa/publications/xml/common/catalog.xml</catalog>
+		          </catalogs>
 		        </configuration>
 		        <dependencies>
-		          	<dependency>
+<!--		          	<dependency>
 		            	<groupId>net.sf.saxon</groupId>
 		            	<artifactId>saxon</artifactId>
 		            	<version>8.7</version>
-					</dependency>
+					</dependency>-->
 		          	<dependency>
 						<groupId>net.sourceforge.saxon</groupId>
 						<artifactId>saxon</artifactId>
@@ -284,6 +287,16 @@
 			                <goal>shade</goal>
 			            </goals>
 			            <configuration>
+							<filters>
+					            <filter>
+					                <artifact>*:*</artifact>
+					                <excludes>
+					                    <exclude>module-info.class</exclude>
+					                    <exclude>META-INF/DEPENDENCIES</exclude>
+					                    <exclude>META-INF/MANIFEST.MF</exclude>
+					                </excludes>
+					            </filter>
+					        </filters>
 			                <shadedArtifactAttached>true</shadedArtifactAttached>
 			                <transformers>
 			                	<transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer">
@@ -307,6 +320,17 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 			    <configuration>
+					<argLine>
+						-Dhttps.proxyHost=${env.HTTPS.PROXYHOST}
+						-Dhttps.proxyPort=${env.HTTPS.PROXYPORT}
+						-Dhttp.proxyHost=${env.HTTP.PROXYHOST}
+						-Dhttp.proxyPort=${env.HTTP.PROXYPORT}
+						-Dhttp.nonProxyHosts='${env.HTTP.NONPROXYHOSTS}'
+						-Dhttp.proxyUser=${env.HTTP.PROXYUSER}
+						-Dhttp.proxyPassword=${env.HTTP.PROXYPASSWORD}
+						-Djdk.http.auth.tunneling.disabledSchemes=${env.JDK.HTTP.AUTH.TUNNELING.DISABLEDSCHEMES}
+						-Djdk.https.auth.tunneling.disabledSchemes=${env.JDK.HTTPS.AUTH.TUNNELING.DISABLEDSCHEMES}
+					</argLine>
 			        <excludes>
 			            <exclude>**/__selectionPattern__.java</exclude>
 			        </excludes>

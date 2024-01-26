@@ -139,7 +139,7 @@ D:\OP\_DEV\XSD11Validator>java -jar target\XSD11Validator-2.0-SNAPSHOT-shaded.ja
 ←[m2. ←[34m11:33:03 eu.europa.publications.xml.tools.Main:110 return Code: 0
 ←[m
 
-D:\OP\_DEV\XSD11Validator>java  -Dlog4j.configurationFile=./src/test/resources/eu/europa/publications/ifc/cov/xerces/log4j2.xml 
+D:\OP\_DEV\XSD11Validator>java  -Dlog4j.configurationFile=./src/test/resources/log4j2.xml 
 -jar target\XSD11Validator-2.0-SNAPSHOT-shaded.jar -i .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xml -s .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xsd -c .\src\test\resources\eu\europa\publications\ifc\cov\xerces\catalog.xml
 1. ←[34m11:34:14 eu.europa.publications.xml.tools.XSD11Validator:83 XSD 1.1 validation using catalog on File .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xml using schema .\src\test\resources\eu\europa\publications\ifc\cov\xerces\xerces-test.xsd and catalog .\src\test\resources\eu\europa\publications\ifc\cov\xerces\catalog.xml
 ←[m2.         11:34:14     eu.europa.publications.xml.tools.XSD11Validator:292 XML Catalog Root Dir: D:\OP\_DEV\XSD11Validator\.\src\test\resources\eu\europa\publications\ifc\cov\xerces
