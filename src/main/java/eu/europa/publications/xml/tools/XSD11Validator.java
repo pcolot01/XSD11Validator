@@ -491,7 +491,17 @@ public final class XSD11Validator {
         if (file.isAbsolute()) {
             return getURL(relativePath).toString();
         } else {
-            if ( basePathOrURL.startsWith("http:") || basePathOrURL.startsWith("https:") || basePathOrURL.startsWith("file:") ) {
+            if ( basePathOrURL.startsWith("urn:") ) {
+                
+                URI baseURI;
+                try {
+                    baseURI = new URI(basePathOrURL);
+                } catch (URISyntaxException e) {
+                    throw new IllegalArgumentException("Invalid base URL: " + basePathOrURL);
+                }
+        
+                return baseURI.toString();
+            } else if ( basePathOrURL.startsWith("http:") || basePathOrURL.startsWith("https:") || basePathOrURL.startsWith("file:") ) {
                 basePathOrURL = basePathOrURL.substring(0, basePathOrURL.lastIndexOf("/") + 1);
                 
                 URI baseURI;
@@ -528,7 +538,7 @@ public final class XSD11Validator {
      */
     public static String getBasePath(String filePathOrURL)
             throws ApplicationHandler {
-        if (filePathOrURL.startsWith("http:") || filePathOrURL.startsWith("https:") || filePathOrURL.startsWith("file:")) {
+        if (filePathOrURL.startsWith("http:") || filePathOrURL.startsWith("https:") || filePathOrURL.startsWith("file:") || filePathOrURL.startsWith("urn:")) {
             // Extract the base path from a URL
             URI uri;
             try {
@@ -564,7 +574,7 @@ public final class XSD11Validator {
         // if any filePathOrURL is provided
         if (filePathOrURL != null) {
             try {
-                if (filePathOrURL.startsWith("http:") || filePathOrURL.startsWith("https:") || filePathOrURL.startsWith("file:")) {
+                if (filePathOrURL.startsWith("http:") || filePathOrURL.startsWith("https:") || filePathOrURL.startsWith("file:") || filePathOrURL.startsWith("urn:")) {
                     // Extract the path as a URL
                     return new URI(filePathOrURL).toURL();
                 } else {
@@ -614,39 +624,37 @@ public final class XSD11Validator {
 
 
 // Develop testsuite to:
-//TODO replicate test for catalog null, empty normal, public, system and referred
-//TODO ... Manage referred catalog in sub-directory
-//TODO ... Add noNamespaceSchemaLocation tests in Test Suite
-//TODO ... Add namespaceSchemaLocation test without used NS in Test Suite
-//TODO ... Add validation using default NS (no pre and NS)
-//TODO ... Add http ref test
-//TODO ... Add public/system and asbolute/relative catalog resolutions for schema
+//TODO ... support NS=urn:... and test targetNamespace to verify good file
+//TODO support check good schema if correct target NS and not file name
 //TODO ... Add use XSD1.1 test suite example
-//TODO ... Add table of combinatory tests
 
-// Modify code generator to filter test resources
-//NOTTODO split NIST 160,000 in fourty
+// Use different catalogs
+//TODO ... replicate test for catalog null, empty normal, public, system and referred
+//TODO ... Manage referred catalog in sub-directory
+//TODO ... Add public/system and asbolute/relative catalog resolutions for schema
 //TODO Add test with absolute references for xml input, xml schema, xml catalog
 //TODO Add test with absolute references in catalog for xml schema, xml catalog
-
-
-// Extend dev to support:
-//TODO support NS=urn:... 
-//TODO support check good schema if correct target NS and not file name
+//TODO Add DTD system identifier tests in Test Suite 
+//TODO Add DTD public identifier tests in Test Suite
 //TODO cache sub schema using catalog
 
+// Extend dev to support:
 //TODO Refactorize to check schema
 //TODO Refactorize to check catalog
 
+// QC
 //TODO Refactorize to reduce God Class (split in classes)
 
+
+
+
+
 // Documentation
-//How to use versioning
+//When and How to use versioning
 
 // Improvements for cat backward compatibility:
 //TODO Refactorize to support DTD
-//TODO Add DTD system identifier tests in Test Suite 
-//TODO Add DTD public identifier tests in Test Suite
+
 
 
 
