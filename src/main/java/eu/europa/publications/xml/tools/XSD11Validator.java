@@ -612,10 +612,9 @@ public final class XSD11Validator {
 
 }
 
-//TODO test for http ressources and add java authentification
 
 // Develop testsuite to:
-//TODO ... Add table of combinatory tests
+//TODO replicate test for catalog null, empty normal, public, system and referred
 //TODO ... Manage referred catalog in sub-directory
 //TODO ... Add noNamespaceSchemaLocation tests in Test Suite
 //TODO ... Add namespaceSchemaLocation test without used NS in Test Suite
@@ -623,10 +622,10 @@ public final class XSD11Validator {
 //TODO ... Add http ref test
 //TODO ... Add public/system and asbolute/relative catalog resolutions for schema
 //TODO ... Add use XSD1.1 test suite example
-
+//TODO ... Add table of combinatory tests
 
 // Modify code generator to filter test resources
-//TODO split NIST 160,000 in fourty
+//NOTTODO split NIST 160,000 in fourty
 //TODO Add test with absolute references for xml input, xml schema, xml catalog
 //TODO Add test with absolute references in catalog for xml schema, xml catalog
 

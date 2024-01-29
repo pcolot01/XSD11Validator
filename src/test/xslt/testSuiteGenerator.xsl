@@ -97,6 +97,28 @@
         <xsl:param name="modulePath" as="xs:string"/>
         <xsl:param name="moduleName" as="xs:string"/>
         <xsl:param name="filename" as="xs:string?"/>
+        
+        <xsl:variable name="basePath" select="concat(@name, '/')"/>
+        <xsl:variable name="filename" select="@name"/>
+        
+        <xsl:variable name="baseName" select="replace(replace(replace($basePath, '/$', ''), '/', '.'), '^(.)', '.$1')"/>
+        
+        <xsl:apply-templates>
+            <xsl:with-param name="generationDirectory" select="$generationDirectory"/>
+            <xsl:with-param name="relativePath" select="concat($relativePath, $basePath)"/>
+            <xsl:with-param name="modulePath" select="concat($modulePath, $basePath)"/>
+            <xsl:with-param name="moduleName" select="concat($moduleName, $baseName)"/>
+            <xsl:with-param name="filename" select="$filename"/>
+        </xsl:apply-templates>
+
+    </xsl:template>
+
+    <xsl:template match="ts:testGroup">
+        <xsl:param name="generationDirectory" as="xs:string"/>
+        <xsl:param name="relativePath" as="xs:string"/>
+        <xsl:param name="modulePath" as="xs:string"/>
+        <xsl:param name="moduleName" as="xs:string"/>
+        <xsl:param name="filename" as="xs:string?"/>
 
         <xsl:call-template name="local:generateFile_xxxTests.java">
             <xsl:with-param name="generationDirectory" select="$generationDirectory"/>
@@ -105,9 +127,7 @@
             <xsl:with-param name="moduleName" select="$moduleName"/>
             <xsl:with-param name="filename" select="$filename"/>
         </xsl:call-template>
-
     </xsl:template>
-
 
     <xsl:template name="local:generateFile_package-info.java">
         <xsl:param name="generationDirectory" as="xs:string"/>
@@ -182,27 +202,6 @@ class </xsl:text><xsl:value-of select="replace(concat(@name, 'Tests'), '-|\.', '
     }
     
 </xsl:text> 
-        <xsl:apply-templates>
-            <xsl:with-param name="generationDirectory" select="$generationDirectory"/>
-            <xsl:with-param name="relativePath" select="$relativePath"/>
-            <xsl:with-param name="modulePath" select="$modulePath"/>
-            <xsl:with-param name="moduleName" select="$moduleName"/>
-            <xsl:with-param name="filename" select="$filename"/>
-        </xsl:apply-templates>
-        <xsl:text>
-}
-</xsl:text>               
-         </xsl:result-document> 
-    </xsl:template>
-
-
-    <xsl:template match="ts:testGroup">
-        <xsl:param name="generationDirectory" as="xs:string"/>
-        <xsl:param name="relativePath" as="xs:string"/>
-        <xsl:param name="modulePath" as="xs:string"/>
-        <xsl:param name="moduleName" as="xs:string"/>
-        <xsl:param name="filename" as="xs:string"/>
-        
         <xsl:text>     // Group: </xsl:text><xsl:value-of select="@name"/><xsl:text>
      //    </xsl:text><xsl:value-of select="@description"/><xsl:text>
 
@@ -217,7 +216,11 @@ class </xsl:text><xsl:value-of select="replace(concat(@name, 'Tests'), '-|\.', '
             <xsl:with-param name="schema" select="ts:schemaTest[1]/ts:schemaDocument[1]/@xlink:href"/>
             <xsl:with-param name="catalog" select="ts:catalogTest[1]/ts:catalogDocument[1]/@xlink:href"/>
             <xsl:with-param name="testName" select="@name"/>
-        </xsl:apply-templates>          
+        </xsl:apply-templates>
+        <xsl:text>
+}
+</xsl:text>               
+         </xsl:result-document> 
     </xsl:template>
 
 

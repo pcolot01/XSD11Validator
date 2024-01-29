@@ -163,7 +163,13 @@ D:\OP\_DEV\XSD11Validator>java  -Dlog4j.configurationFile=./src/test/resources/l
 20.         11:34:15     eu.europa.publications.xml.tools.XSD11Validator:118 XML document validation finished.
 21. ←[34m11:34:15 eu.europa.publications.xml.tools.Main:110 return Code: 0
 
+GIT:
+====
+git submodule add https://github.com/w3c/xsdtests src/test/resources/eu/europa/publications/xml/testSuites/w3cXsdtests
 
+git submodule add URL path
+git submodule sync
+git submodule init
 
 TODO after changes:
 ===================
