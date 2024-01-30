@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
-    <system systemId="../../../a/path/to/xerces-test.xsd" uri="file:/C:/Users/Home/Documents/GitHub/XSD11Validator/src/test/resources/eu/europa/publications/xml/testSets/tools/public/schemas/xerces-test.xsd"/>
-    <public publicId="http://mydomain.org/mygrammar" uri="file:/C:/Users/Home/Documents/GitHub/XSD11Validator/src/test/resources/eu/europa/publications/xml/testSets/tools/public/schemas/xerces-test.xsd"/>
+    <system systemId="../../../a/path/to/xerces-test.xsd" uri="file:../../schemas/xerces-test.xsd"/>
+    <public publicId="http://mydomain.org/mygrammar" uri="file:../../schemas/xerces-test.xsd"/>
+
+    <public publicId="urn:my:xercesTestUrn" uri="file:../schemas/xerces-test-Urn.xsd"/>
 </catalog>

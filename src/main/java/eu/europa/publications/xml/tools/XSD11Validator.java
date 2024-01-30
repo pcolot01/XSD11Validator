@@ -336,7 +336,7 @@ public final class XSD11Validator {
                 } else {
                     // schemaLocations not present
                     // keep current namespaceURI
-                    LOGGER.trace(MARKER, "No schemalocations is associated to root element the URI " + namespaceURI + "stay unchanged");
+                    LOGGER.trace(MARKER, "No schemalocations is associated to root element the URI " + namespaceURI + " stay unchanged");
                 }
             }
             
