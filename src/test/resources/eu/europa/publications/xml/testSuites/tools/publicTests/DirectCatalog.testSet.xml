@@ -70,6 +70,35 @@
             <current status="accepted" date="2024-01-20"/>
         </instanceTest>
     </testGroup>
+
+    <testGroup name="failedInexistingReferredSchema" description="Failed handled Errors" version="1.1">
+        <annotation>
+            <documentation>
+                <Title>Simple title</Title>
+                <Description>Simple test</Description>
+            </documentation>
+        </annotation>
+        <catalogTest name="catalog.xml">
+            <catalogDocument xlink:href="catalogs/catalog.xml"/>
+            <expected validity="valid"/>
+            <current status="accepted" date="2024-01-20"/>
+        </catalogTest>
+        <schemaTest name="xerces-test.xsd">
+            <schemaDocument xlink:href="schemas/xerces-test.xsd"/>
+            <expected validity="valid"/>
+            <current status="accepted" date="2024-01-20"/>
+        </schemaTest>
+        <instanceTest name="xerces-test-Invalid2.xml">
+		        <annotation>
+		            <documentation>
+		                Invalid, Test failing due to inexisting referred schema.
+		            </documentation>
+		        </annotation>
+            <instanceDocument xlink:href="instances/xerces-test-Invalid2.xml"/>
+            <expected validity="invalid" withCode="2"/>
+            <current status="accepted" date="2024-01-20"/>
+        </instanceTest>
+    </testGroup>
     
     <testGroup name="failedInexistingSource" description="Failed handled Errors" version="1.1">
         <annotation>
@@ -95,7 +124,7 @@
 		            </documentation>
 		        </annotation>
             <instanceDocument xlink:href="instances/inexistingFile.xml"/>
-            <expected validity="valid" withCode="1"/>
+            <expected validity="invalid" withCode="1"/>
             <current status="accepted" date="2024-01-20"/>
         </instanceTest>
     </testGroup>
@@ -539,7 +568,7 @@
         </instanceTest>
     </testGroup>        
     
-    <testGroup name="successfullValidationCatalogBasedNoSSchemaLocationUnused" description="Failed handled Errors" version="1.1">
+    <testGroup name="successfullValidationCatalogBasedNoSchemaLocationUsed" description="Failed handled Errors" version="1.1">
         <annotation>
             <documentation>
                 <Title>Simple title</Title>
@@ -556,13 +585,13 @@
             <expected validity="valid"/>
             <current status="accepted" date="2024-01-20"/>
         </schemaTest>
-        <instanceTest name="xerces-test-InternalNoSSchemaLocationUnused.xml">
+        <instanceTest name="xerces-test-InternalNoSchemaLocationUsed.xml">
 		        <annotation>
 		            <documentation>
 		                Valid.
 		            </documentation>
 		        </annotation>
-            <instanceDocument xlink:href="instances/xerces-test-InternalNoSSchemaLocationUnused.xml"/>
+            <instanceDocument xlink:href="instances/xerces-test-InternalNoSchemaLocationUsed.xml"/>
             <expected validity="valid" withCode="0"/>
             <current status="accepted" date="2024-01-20"/>
         </instanceTest>
@@ -581,7 +610,7 @@
             <current status="accepted" date="2024-01-20"/>
         </catalogTest>
         <schemaTest name="xerces-test.xsd">
-            <schemaDocument xlink:href="null()"/>
+            <schemaDocument xlink:href="schemas/xerces-test-NoTargetNS.xsd"/>
             <expected validity="valid"/>
             <current status="accepted" date="2024-01-20"/>
         </schemaTest>
@@ -597,6 +626,35 @@
         </instanceTest>
     </testGroup>
 
+    <testGroup name="SuccesNoNamespace" description="Successful validation of instance without NS" version="1.1">
+        <annotation>
+            <documentation>
+                <Title>Simple title</Title>
+                <Description>Simple test</Description>
+            </documentation>
+        </annotation>
+        <catalogTest name="catalog.xml">
+            <catalogDocument xlink:href="catalogs/catalog.xml"/>
+            <expected validity="valid"/>
+            <current status="accepted" date="2024-01-20"/>
+        </catalogTest>
+        <schemaTest name="xerces-test-NoTargetNS.xsd">
+            <schemaDocument xlink:href="schemas/xerces-test-NoTargetNS.xsd"/>
+            <expected validity="valid"/>
+            <current status="accepted" date="2024-01-20"/>
+        </schemaTest>
+        <instanceTest name="xerces-test-NoInternalSchema.xml">
+		        <annotation>
+		            <documentation>
+		                Successful validation of instance without NS.
+		            </documentation>
+		        </annotation>
+            <instanceDocument xlink:href="instances/xerces-test-NoInternalSchema.xml"/>
+            <expected validity="valid" withCode="0"/>
+            <current status="accepted" date="2024-01-20"/>
+        </instanceTest>
+    </testGroup>
+
     <testGroup name="SuccesfulHttpThruProxy" description="Successful validation of remote Http xml file obtainied thru authenticated proxy" version="1.1">
         <annotation>
             <documentation>
@@ -605,7 +663,7 @@
             </documentation>
         </annotation>
         <catalogTest name="catalog.xml">
-            <catalogDocument xlink:href="null()"/>
+            <catalogDocument xlink:href="catalogs/catalog.xml"/>
             <expected validity="valid"/>
             <current status="accepted" date="2024-01-20"/>
         </catalogTest>
@@ -625,5 +683,33 @@
             <current status="accepted" date="2024-01-20"/>
         </instanceTest>
     </testGroup>
-        
+
+    <testGroup name="SuccesfulUrnNS" description="Successful validation using an URN reference for the schema" version="1.1">
+        <annotation>
+            <documentation>
+                <Title>Simple title</Title>
+                <Description>Simple test</Description>
+            </documentation>
+        </annotation>
+        <catalogTest name="catalog.xml">
+            <catalogDocument xlink:href="catalogs/catalog.xml"/>
+            <expected validity="valid"/>
+            <current status="accepted" date="2024-01-20"/>
+        </catalogTest>
+        <schemaTest name="xerces-test.xsd">
+            <schemaDocument xlink:href="null()"/>
+            <expected validity="valid"/>
+            <current status="accepted" date="2024-01-20"/>
+        </schemaTest>
+        <instanceTest name="ipo_1.xml">
+		        <annotation>
+		            <documentation>
+		                Successful validation of remote Http xml file obtainied thru authenticated proxy.
+		            </documentation>
+		        </annotation>
+            <instanceDocument xlink:href="https://raw.githubusercontent.com/w3c/xsdtests/master/boeingData/ipo1/ipo_1.xml"/>
+            <expected validity="valid" withCode="0"/>
+            <current status="accepted" date="2024-01-20"/>
+        </instanceTest>
+    </testGroup>        
 </testSet>  

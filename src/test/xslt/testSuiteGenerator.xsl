@@ -105,9 +105,13 @@
         
         <xsl:apply-templates>
             <xsl:with-param name="generationDirectory" select="$generationDirectory"/>
-            <xsl:with-param name="relativePath" select="concat($relativePath, $basePath)"/>
+            <xsl:with-param name="relativePath" select="$relativePath"/>
+            <xsl:with-param name="modulePath" select="$modulePath"/>
+            <xsl:with-param name="moduleName" select="$moduleName"/>
+
+<!--            <xsl:with-param name="relativePath" select="concat($relativePath, $basePath)"/>
             <xsl:with-param name="modulePath" select="concat($modulePath, $basePath)"/>
-            <xsl:with-param name="moduleName" select="concat($moduleName, $baseName)"/>
+            <xsl:with-param name="moduleName" select="concat($moduleName, $baseName)"/>-->
             <xsl:with-param name="filename" select="$filename"/>
         </xsl:apply-templates>
 

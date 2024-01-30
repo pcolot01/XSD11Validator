@@ -335,7 +335,7 @@
 			            <exclude>**/__selectionPattern__.java</exclude>
 			        </excludes>
 			    	<systemPropertyVariables>
-        				<log4j.configurationFile>./src/test/resources/log4j2.xml</log4j.configurationFile>
+        				<log4j.configurationFile>./src/test/resources/log4j2-info.xml</log4j.configurationFile>
       			  </systemPropertyVariables>
 				</configuration>
 			</plugin>

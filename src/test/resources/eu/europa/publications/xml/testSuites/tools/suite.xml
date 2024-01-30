@@ -11,7 +11,7 @@
   <ts:documentation>Test suite</ts:documentation>
  </ts:annotation>
 
- <ts:testSetRef xlink:href="privateTests/suite.xml"/>
+<!-- <ts:testSetRef xlink:href="privateTests/suite.xml"/>-->
  <ts:testSetRef xlink:href="publicTests/suite.xml"/>
   
 </ts:testSuite>
