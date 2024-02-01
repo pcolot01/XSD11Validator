@@ -13,6 +13,8 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+import javax.xml.XMLConstants;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -307,7 +309,12 @@ public final class XSD11Validator {
         
         // 2. Create a schema factory for XML 1.1
         SchemaFactory schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1");
+        
+        //activating all xpath features supported (version 1, 2, and ...) 
         schemaFactory.setFeature("http://apache.org/xml/features/validation/cta-full-xpath-checking", true);
+
+        //restrict XML constants to avoid Deny Of Service attack
+        schemaFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         
         //handle multiple files with same targetnamespace
         schemaFactory.setFeature("http://apache.org/xml/features/honour-all-schemaLocations", true);
