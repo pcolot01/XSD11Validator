@@ -103,7 +103,7 @@ public final class Main {
             final String catalogFilePath = cmd.getOptionValue("catalog");
             final XSD11Validator xsd11Validator = new XSD11Validator();
 
-            returnCode = xsd11Validator.validateFile(inputFilePath, schemaFilePath, catalogFilePath);
+            returnCode = xsd11Validator.validateXmlInstance(inputFilePath, schemaFilePath, catalogFilePath);
         } catch (ParseException e) {
             LOGGER.error(MARKER, e.getMessage());
             formatter.printHelp("XSD11Validator", options);

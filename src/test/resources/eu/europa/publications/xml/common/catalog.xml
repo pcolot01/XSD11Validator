@@ -12,6 +12,14 @@
     <system systemId="w3cXsdtests/nistMeta/AnnotatedTSSchema.xsd" uri="xsts.xsd"/>
     <public publicId="w3cXsdtests/nistMeta/AnnotatedTSSchema.xsd" uri="xsts.xsd"/>
 	<rewriteSystem systemIdStartString="w3cXsdtests/nistMeta/AnnotatedTSSchema.xsd" rewritePrefix="xsts.xsd" />
+
+    <system systemId="nistMeta/AnnotatedTSSchema.xsd" uri="xsts.xsd"/>
+    <public publicId="nistMeta/AnnotatedTSSchema.xsd" uri="xsts.xsd"/>
+	<rewriteSystem systemIdStartString="nistMeta/AnnotatedTSSchema.xsd" rewritePrefix="xsts.xsd" />
+
+    <system systemId="../common/xsts.xsd" uri="xsts.xsd"/>
+    <public publicId="../common/xsts.xsd" uri="xsts.xsd"/>
+	<rewriteSystem systemIdStartString="../common/xsts.xsd" rewritePrefix="xsts.xsd" />
 	
 	<system systemId="http://www.w3.org/XML/2004/xml-schema-test-suite/" uri="xsts.xsd"/>
     <public publicId="http://www.w3.org/XML/2004/xml-schema-test-suite/" uri="xsts.xsd"/>

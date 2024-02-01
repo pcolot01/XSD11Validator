@@ -162,13 +162,30 @@
 		        <configuration>
 				  <skip>false</skip>
 		          <transformationSets>
-		            <transformationSet>
-		              <dir>src/test/resources/eu/europa/publications/xml/testSuites/</dir>
-		              <includes>
+<!--		            <transformationSet>
+		                <dir>src/test/resources/eu/europa/publications/xml/testSuites/</dir>
+		                <includes>
 						  <include>suite.xml</include>
-					  </includes>
-		              <stylesheet>src/test/xslt/testSuiteGenerator.xsl</stylesheet>
-		            </transformationSet>
+					    </includes>
+		                <stylesheet>src/test/xslt/testSuiteGenerator.xsl</stylesheet>
+		            </transformationSet>-->
+		            <transformationSet>
+		                <dir>../w3cXsdtests/</dir>
+		                <includes>
+						    <include>suite.xml</include>
+					    </includes>
+		                <stylesheet>src/test/xslt/testSuiteGenerator.xsl</stylesheet>
+						<parameters>
+							<parameter>
+								<name>moduleName</name>
+								<value>eu.europa.publications.xml.w3cXsdtests</value>
+							</parameter>
+							<parameter>
+								<name>modulePath</name>
+								<value>eu/europa/publications/xml/w3cXsdtests/</value>
+							</parameter>							
+						</parameters>		                
+		            </transformationSet>		            
 		          </transformationSets>
 		          <catalogs>
 		            <catalog>src/test/resources/eu/europa/publications/xml/common/catalog.xml</catalog>
@@ -321,6 +338,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 			    <configuration>
 					<argLine>
+						-Djdk.net.URLClassPath.disableClassPathURLCheck=true
 						-Dhttps.proxyHost=${env.HTTPS.PROXYHOST}
 						-Dhttps.proxyPort=${env.HTTPS.PROXYPORT}
 						-Dhttp.proxyHost=${env.HTTP.PROXYHOST}
