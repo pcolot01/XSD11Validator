@@ -71,7 +71,7 @@ public final class XSD11Validator {
     }
 
     /**
-     * Validate File using XML Schema 1.1 and OASIS catalog support.
+     * Validate XML instance using XML Schema 1.1 and OASIS catalog support.
      * <p>
      * Example of usage:
      * <p>
@@ -88,10 +88,8 @@ public final class XSD11Validator {
      * @author pcolot
      * @version 1.0
      */
-    public int validateFile(final String xmlInput, final String xsdInput,
+    public int validateXmlInstance(final String xmlInput, final String xsdInput,
             final String catalogFileName) {
-        
-
         
         // 1. Logging using Log4j2
         LOGGER.info(MARKER,
@@ -125,6 +123,52 @@ public final class XSD11Validator {
         return ApplicationHandler.getErrorCount();
     }
 
+    
+    /**
+     * Validate Schema using XML Schema 1.1 and OASIS catalog support.
+     * <p>
+     * Example of usage:
+     * <p>
+     * returnCode = xsd11Validator.validateSchema("myPathToXMLSchemaFile.xml", "myPathToXMLCatalogFile.xml");
+     * 
+     * @param xsdInput the optional XML schema 
+     * @param catalogFileName the optional OASIS catalog 
+     * @return The integer return code 0: successful >0: failed with number of
+     * errors
+     *
+     * @since 1.0
+     * @author pcolot
+     * @version 1.0
+     */
+    public int validateSchema(final String xsdInput,
+            final String catalogFileName) {
+        
+        // 1. Logging using Log4j2
+        LOGGER.info(MARKER,
+                    "XSD 1.1 validation using catalog on schema " + xsdInput + " and catalog "
+                        + catalogFileName);
+
+        try {
+            
+            // 1. Get the validator from provide schema, catalog and xml input
+            Validator validator = getValidator(xsdInput, catalogFileName);
+            LOGGER.trace(MARKER, "Validate ended without errors");
+        
+        // 5. Alternate flows
+        } catch (SAXException e) {
+            LOGGER.error(MARKER, "XML document is invalid with "
+                    + ApplicationHandler.getErrorCount() + " error(s).");
+        } catch (Exception e) {
+            LOGGER.error(MARKER, "XML document is invalid with "
+                    + ApplicationHandler.getErrorCount() + " error(s).");
+        } finally {
+            // 20. Display end of validation
+            LOGGER.trace(MARKER, "XML document validation finished.");
+        }
+        return ApplicationHandler.getErrorCount();
+    }    
+    
+    
     /** Get Validator engine.
      * 
      * @param xsdInput
@@ -141,8 +185,45 @@ public final class XSD11Validator {
             StreamSource xmlInputStreamSource) 
                     throws ApplicationHandler, SAXNotRecognizedException, SAXNotSupportedException {
 
+        return getValidatorEngine(xsdInput, catalogFileName, xmlInputStreamSource);
+    }
+ 
+    /** Get Validator engine.
+     * 
+     * @param xsdInput
+     * @param catalogFileName
+     * @param xmlInputStreamSource
+     * @return The Validator
+     * @throws ApplicationHandler The application exception handler
+     * @throws SAXNotRecognizedException
+     * @throws SAXNotSupportedException
+     */
+    private Validator getValidator(
+            final String xsdInput,
+            final String catalogFileName) 
+                    throws ApplicationHandler, SAXNotRecognizedException, SAXNotSupportedException {
+   
+        return getValidatorEngine(xsdInput, catalogFileName, null);
+    }
+    
+    /** Get Validator engine.
+     * 
+     * @param xsdInput
+     * @param catalogFileName
+     * @param xmlInputStreamSource
+     * @return The Validator
+     * @throws ApplicationHandler The application exception handler
+     * @throws SAXNotRecognizedException
+     * @throws SAXNotSupportedException
+     */
+    private Validator getValidatorEngine(
+            final String xsdInput,
+            final String catalogFileName,
+            StreamSource xmlInputStreamSource) 
+                    throws ApplicationHandler, SAXNotRecognizedException, SAXNotSupportedException {
+
         // 1. Get the Validator
-        LOGGER.trace(MARKER, "Get Validator on XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId());
+        if (xmlInputStreamSource != null) { LOGGER.trace(MARKER, "Get Validator on XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId()); }
         if (xsdInput != null) { LOGGER.trace(MARKER, "  using external xsd: " + xsdInput); }
         if (catalogFileName != null) { LOGGER.trace(MARKER, "  and catalog: " + catalogFileName); }
 
@@ -150,7 +231,7 @@ public final class XSD11Validator {
         XMLCatalogResolver catalogResolver = getCatalogResolver(catalogFileName);
         
         // 3. Create a schema engine
-        Schema schema = getSchema(xsdInput, xmlInputStreamSource, catalogResolver);
+        Schema schema = (xmlInputStreamSource != null) ? getSchema(xsdInput, xmlInputStreamSource, catalogResolver) : getSchema(xsdInput, catalogResolver);
         
         // 4. Create a validator based on the schema engine
         Validator validator = schema.newValidator();
@@ -164,6 +245,7 @@ public final class XSD11Validator {
         return validator;
     }
 
+    
     /** Get Schema engine.
      * 
      * @param xsdInput
@@ -179,10 +261,48 @@ public final class XSD11Validator {
             StreamSource xmlInputStreamSource,
             XMLCatalogResolver catalogResolver) throws ApplicationHandler,
             SAXNotRecognizedException, SAXNotSupportedException {
+
+        // 1. Get schema name
+        URL xsdInputURL = getXsdURL(xsdInput, xmlInputStreamSource, catalogResolver);
+        
+        return getSchema(xsdInputURL, catalogResolver);
+    }
+    
+    /** Get Schema engine.
+     * 
+     * @param xsdInput
+     * @param catalogResolver
+     * @return The Schema
+     * @throws ApplicationHandler The application exception handler
+     * @throws SAXNotRecognizedException
+     * @throws SAXNotSupportedException
+     */
+    private static Schema getSchema(
+            final String xsdInput,
+            XMLCatalogResolver catalogResolver) throws ApplicationHandler,
+            SAXNotRecognizedException, SAXNotSupportedException {
+
+        // 1. Get schema name
+        URL xsdInputURL = getURL(xsdInput);
+        
+        return getSchema(xsdInputURL, catalogResolver);
+    } 
+    
+    /** Get Schema engine.
+     * 
+     * @param xsdInputURL
+     * @param catalogResolver
+     * @return The Schema
+     * @throws ApplicationHandler The application exception handler
+     * @throws SAXNotRecognizedException
+     * @throws SAXNotSupportedException   */
+    private static Schema getSchema(
+            final URL xsdInputURL,
+            XMLCatalogResolver catalogResolver) throws ApplicationHandler,
+            SAXNotRecognizedException, SAXNotSupportedException {
         
         // 1. Get the Validator
-        LOGGER.trace(MARKER, "Get Schema on XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId());
-        if (xsdInput != null) { LOGGER.trace(MARKER, "  using external xsd: " + xsdInput); }
+        if (xsdInputURL != null) { LOGGER.trace(MARKER, "  using external xsd: " + xsdInputURL.toString()); }
         LOGGER.trace(MARKER, "  and catalog: " + catalogResolver);
         
         // 2. Create a schema factory for XML 1.1
@@ -195,10 +315,6 @@ public final class XSD11Validator {
         // associate the schema factory with the resource resolver, which is responsible for resolving the imported XSD's
         //schemaFactory.setResourceResolver(new ResourceResolver());
 
-
-        // 3. Get schema name
-        URL xsdInputURL = getXsdURL(xsdInput, xmlInputStreamSource, catalogResolver);
-        
         // 4. Get the schema
         LOGGER.trace(MARKER, "Creating schema from " + xsdInputURL);
         Schema schema = null;
@@ -627,6 +743,7 @@ public final class XSD11Validator {
 //TODO ... support NS=urn:... and test targetNamespace to verify good file
 //TODO support check good schema if correct target NS and not file name
 //TODO ... Add use XSD1.1 test suite example
+    // add default catalog to patch testsuite errors
 
 // Use different catalogs
 //TODO ... replicate test for catalog null, empty normal, public, system and referred
