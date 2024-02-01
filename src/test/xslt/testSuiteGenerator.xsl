@@ -165,7 +165,10 @@ package </xsl:text><xsl:value-of select="$moduleName"/><xsl:text>;</xsl:text>
             <xsl:text>package </xsl:text><xsl:value-of select="$moduleName"/><xsl:text>;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.BeforeEach;
+
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -291,6 +294,7 @@ class </xsl:text><xsl:value-of select="replace(concat($filename, '_', @name, 'Te
      * 
      */
     @Test
+    @Timeout(value = 15, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 	void </xsl:text><xsl:value-of select="$methodName"/><xsl:text>()
 	{
 	    final String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
@@ -376,6 +380,7 @@ class </xsl:text><xsl:value-of select="replace(concat($filename, '_', @name, 'Te
      * 
      */
     @Test
+    @Timeout(value = 15, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 	void </xsl:text><xsl:value-of select="$methodName"/><xsl:text>()
 	{
 	    final String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
