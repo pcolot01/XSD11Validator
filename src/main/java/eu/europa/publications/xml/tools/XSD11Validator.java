@@ -740,27 +740,22 @@ public final class XSD11Validator {
 
 
 // Develop testsuite to:
-//TODO ... support NS=urn:... and test targetNamespace to verify good file
 //TODO support check good schema if correct target NS and not file name
 //TODO ... Add use XSD1.1 test suite example
-    // add default catalog to patch testsuite errors
 
 // Use different catalogs
 //TODO ... replicate test for catalog null, empty normal, public, system and referred
 //TODO ... Manage referred catalog in sub-directory
 //TODO ... Add public/system and asbolute/relative catalog resolutions for schema
 //TODO Add test with absolute references for xml input, xml schema, xml catalog
-//TODO Add test with absolute references in catalog for xml schema, xml catalog
 //TODO Add DTD system identifier tests in Test Suite 
 //TODO Add DTD public identifier tests in Test Suite
-//TODO cache sub schema using catalog
 
 // Extend dev to support:
-//TODO Refactorize to check schema
-//TODO Refactorize to check catalog
+//TODO ....Refactorize to check catalog
 
 // QC
-//TODO Refactorize to reduce God Class (split in classes)
+//xxxxTODO Refactorize to reduce God Class (split in classes)
 
 
 
