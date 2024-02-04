@@ -303,9 +303,9 @@ class </xsl:text><xsl:value-of select="replace(concat($filename, '_', @name, 'Te
 		int returnValue = xsd11Validator.validateSchema(</xsl:text><xsl:value-of select="local:stringOrNull($relativePath, $schema)"/><xsl:text>, </xsl:text><xsl:value-of select="local:stringOrNull($relativePath, $catalog)"/><xsl:text>);
 </xsl:text>
             <xsl:choose>
-                <xsl:when test="not(empty(../ts:expected/@withCode))">
+                <xsl:when test="not(empty(../ts:expected[last()]/@withCode))">
                     <xsl:text>
-		int expectedValue = </xsl:text><xsl:value-of select="../ts:expected/@withCode"/><xsl:text>;
+		int expectedValue = </xsl:text><xsl:value-of select="../ts:expected[last()]/@withCode"/><xsl:text>;
 		boolean hasCode = (returnValue == expectedValue);
 		if (hasCode) logger.info(marker, "Test: " + methodName + " returned: " + returnValue + " As expected");
 		else logger.error(marker, "Test: " + methodName + " returned unexpected value: " + returnValue + " in place of expected value: " + expectedValue) ;
@@ -325,7 +325,7 @@ class </xsl:text><xsl:value-of select="replace(concat($filename, '_', @name, 'Te
                 </xsl:otherwise>
             </xsl:choose>
         <xsl:text>;
-		if (asExpected) logger.info(marker, "Test: " + methodName + " returned status: </xsl:text><xsl:value-of select="../ts:expected/@validity"/><xsl:text> As expected");
+		if (asExpected) logger.info(marker, "Test: " + methodName + " returned status: </xsl:text><xsl:value-of select="../ts:expected[last()]/@validity"/><xsl:text> As expected");
 		else logger.error(marker, "Test: " + methodName + " returned unexpected status: </xsl:text>
             <xsl:choose>
                 <xsl:when test="../ts:expected[last()]/@validity eq 'valid'">
@@ -389,9 +389,9 @@ class </xsl:text><xsl:value-of select="replace(concat($filename, '_', @name, 'Te
 		int returnValue = xsd11Validator.validateXmlInstance(</xsl:text><xsl:value-of select="local:stringOrNull($relativePath, @xlink:href)"/><xsl:text>, </xsl:text><xsl:value-of select="local:stringOrNull($relativePath, $schema)"/><xsl:text>, </xsl:text><xsl:value-of select="local:stringOrNull($relativePath, $catalog)"/><xsl:text>);
 </xsl:text>
             <xsl:choose>
-                <xsl:when test="not(empty(../ts:expected/@withCode))">
+                <xsl:when test="not(empty(../ts:expected[last()]/@withCode))">
                     <xsl:text>
-		int expectedValue = </xsl:text><xsl:value-of select="../ts:expected/@withCode"/><xsl:text>;
+		int expectedValue = </xsl:text><xsl:value-of select="../ts:expected[last()]/@withCode"/><xsl:text>;
 		boolean hasCode = (returnValue == expectedValue);
 		if (hasCode) logger.info(marker, "Test: " + methodName + " returned: " + returnValue + " As expected");
 		else logger.error(marker, "Test: " + methodName + " returned unexpected value: " + returnValue + " in place of expected value: " + expectedValue) ;
@@ -411,7 +411,7 @@ class </xsl:text><xsl:value-of select="replace(concat($filename, '_', @name, 'Te
                 </xsl:otherwise>
             </xsl:choose>
         <xsl:text>;
-		if (asExpected) logger.info(marker, "Test: " + methodName + " returned status: </xsl:text><xsl:value-of select="../ts:expected/@validity"/><xsl:text> As expected");
+		if (asExpected) logger.info(marker, "Test: " + methodName + " returned status: </xsl:text><xsl:value-of select="../ts:expected[last()]/@validity"/><xsl:text> As expected");
 		else logger.error(marker, "Test: " + methodName + " returned unexpected status: </xsl:text>
             <xsl:choose>
                 <xsl:when test="../ts:expected[last()]/@validity eq 'valid'">
