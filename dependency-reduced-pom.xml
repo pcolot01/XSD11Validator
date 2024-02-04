@@ -130,7 +130,8 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <argLine>-Dhttps.proxyHost=${env.HTTPS.PROXYHOST}
+          <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true
+						-Dhttps.proxyHost=${env.HTTPS.PROXYHOST}
 						-Dhttps.proxyPort=${env.HTTPS.PROXYPORT}
 						-Dhttp.proxyHost=${env.HTTP.PROXYHOST}
 						-Dhttp.proxyPort=${env.HTTP.PROXYPORT}

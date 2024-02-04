@@ -1,12 +1,15 @@
 package eu.europa.publications.xml.tools;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URI;
 import java.net.Authenticator;
 import java.net.URISyntaxException;
 
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
@@ -20,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.apache.xerces.util.XMLCatalogResolver;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
@@ -153,7 +157,7 @@ public final class XSD11Validator {
         try {
             
             // 1. Get the validator from provide schema, catalog and xml input
-            Validator validator = getValidator(xsdInput, catalogFileName);
+            getValidator(xsdInput, catalogFileName);
             LOGGER.trace(MARKER, "Validate ended without errors");
         
         // 5. Alternate flows
@@ -363,6 +367,12 @@ public final class XSD11Validator {
         URL internalSchemaNameURL = getXsdInternalURL(xmlInputStreamSource, catalogResolver);
         LOGGER.trace(MARKER, "Extracted internal schema name URL: " + internalSchemaNameURL);
         
+        if (internalSchemaNameURL == null) {
+            // Fall back to DTD
+            internalSchemaNameURL = getDtdInternalURL(xmlInputStreamSource, catalogResolver);
+            LOGGER.trace(MARKER, "Extracted internal DTD name URL: " + internalSchemaNameURL);
+        }
+        
         if (xsdInput == null) {
          // 3. Without forced schema used the resolved internal one
             if (internalSchemaNameURL != null) {
@@ -370,7 +380,7 @@ public final class XSD11Validator {
             
             return xsdInputURL;
             } else {
-                throw new ApplicationHandler("Neither a nonamspace nor a namspace is attached to the root nor a default no namespace location is provided");
+                throw new ApplicationHandler("Neither a nonamespace nor a namespace is attached to the root nor a default no namespace location is provided");
             }
         } else {
             // 4. Unless used the forced schema
@@ -503,6 +513,104 @@ public final class XSD11Validator {
         }
     }
     
+    
+    /** Get the DTD URL defined inside the XML instance.
+     * 
+     * @param xsdInput
+     * @param xmlInputStreamSource
+     * @param catalogResolver
+     * @return The URL
+     * @throws ApplicationHandler The application exception handler
+     * @throws SAXNotRecognizedException
+     * @throws SAXNotSupportedException
+     */
+    private static URL getDtdInternalURL(
+            StreamSource xmlInputStreamSource,
+            XMLCatalogResolver catalogResolver) throws ApplicationHandler {
+        try {            
+            // 1. Extract DTD UrL
+            LOGGER.trace(MARKER, "Get internal DTD URL from XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId());
+            LOGGER.trace(MARKER, "  and catalog: " + catalogResolver);
+            
+            final InputStream inputStream = new URL(xmlInputStreamSource.getSystemId()).openStream();
+            final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            
+            //documentBuilderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+
+            // If you can't completely disable DTDs, then at least do the following:
+            // Xerces 1 - http://xerces.apache.org/xerces-j/features.html#external-general-entities
+            // Xerces 2 - http://xerces.apache.org/xerces2-j/features.html#external-general-entities
+            // JDK7+ - http://xml.org/sax/features/external-general-entities
+            documentBuilderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+
+            // Xerces 1 - http://xerces.apache.org/xerces-j/features.html#external-parameter-entities
+            // Xerces 2 - http://xerces.apache.org/xerces2-j/features.html#external-parameter-entities
+            // JDK7+ - http://xml.org/sax/features/external-parameter-entities
+            documentBuilderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+
+            // Disable external DTDs as well
+            documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
+            // and these as well, per Timothy Morgan's 2014 paper: "XML Schema, DTD, and Entity Attacks"
+            documentBuilderFactory.setXIncludeAware(false);
+            documentBuilderFactory.setExpandEntityReferences(false);
+            
+            documentBuilderFactory.setNamespaceAware(false);
+            documentBuilderFactory.setValidating(false);
+            
+            final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            //documentBuilder.setEntityResolver(catalogResolver);
+            Document document = documentBuilder.parse(inputStream);
+            String namespaceURI;
+            if (document.getDoctype() != null) {
+                String systemId = document.getDoctype().getSystemId();
+                String publicId = document.getDoctype().getPublicId();
+                
+                namespaceURI = (systemId != null) ? systemId : publicId;
+            } else {
+                namespaceURI = null;
+            }
+            inputStream.close();
+            
+
+            LOGGER.trace(MARKER, "Get namespaceURI : " + namespaceURI);
+
+            // if any namespace is defined try to resolved it
+            if (namespaceURI != null) {
+                //4. Resolve namespaceURI against catalog Public, System, Relative to XMLInput
+                LOGGER.trace(MARKER, "Resolve URI " + namespaceURI + " against catalog Public, System, Relative to XMLInput");
+                
+                String resolvedId = catalogResolver.resolvePublic(namespaceURI, null);
+                if (resolvedId == null) {
+                    LOGGER.trace(MARKER, "Failed Resolving of URI " + namespaceURI + " against Public catalog");
+                    
+                    resolvedId = catalogResolver.resolveSystem(namespaceURI);
+                    if (resolvedId == null) {
+                        LOGGER.trace(MARKER, "Failed Resolving of URI " + namespaceURI + " against System catalog");
+                        
+                        resolvedId = resolveRelativePath(xmlInputStreamSource.getSystemId(), namespaceURI);
+                        if (resolvedId == null) {
+                            LOGGER.trace(MARKER, "Failed Resolving of URI " + namespaceURI + " relative to XMLInput");
+                            resolvedId = namespaceURI;
+                        } else {
+                            LOGGER.trace(MARKER, "Successful Resolving of URI " + namespaceURI + " relative to XMLInput as " + resolvedId);                
+                        }
+                    } else {
+                        LOGGER.trace(MARKER, "Successful Resolving of URI " + namespaceURI + " against System catalog as " + resolvedId);                
+                    }
+                } else {
+                    LOGGER.trace(MARKER, "Successful Resolving of URI " + namespaceURI + " against Public catalog as " + resolvedId);                
+                }
+                return getURL(resolvedId);                
+            } else {
+                return null;
+            }
+        } catch ( ApplicationHandler a) {
+            throw a;
+        } catch ( Exception e) {
+            throw new ApplicationHandler(e);
+        }
+    }
     
     /** Get XML input stream. 
      * 
@@ -747,27 +855,22 @@ public final class XSD11Validator {
 
 
 // Develop testsuite to:
-//TODO ... support NS=urn:... and test targetNamespace to verify good file
-//TODO support check good schema if correct target NS and not file name
+//xxxxTODO support check good schema if correct target NS and not file name
 //TODO ... Add use XSD1.1 test suite example
-    // add default catalog to patch testsuite errors
 
 // Use different catalogs
 //TODO ... replicate test for catalog null, empty normal, public, system and referred
 //TODO ... Manage referred catalog in sub-directory
 //TODO ... Add public/system and asbolute/relative catalog resolutions for schema
 //TODO Add test with absolute references for xml input, xml schema, xml catalog
-//TODO Add test with absolute references in catalog for xml schema, xml catalog
 //TODO Add DTD system identifier tests in Test Suite 
 //TODO Add DTD public identifier tests in Test Suite
-//TODO cache sub schema using catalog
 
 // Extend dev to support:
-//TODO Refactorize to check schema
-//TODO Refactorize to check catalog
+//TODO ....Refactorize to check catalog
 
 // QC
-//TODO Refactorize to reduce God Class (split in classes)
+//xxxxTODO Refactorize to reduce God Class (split in classes)
 
 
 
@@ -780,28 +883,15 @@ public final class XSD11Validator {
 //TODO Refactorize to support DTD
 
 
+//myDocumentBuilder.setEntityResolver(new EntityResolver() {
+//    public InputSource resolveEntity(java.lang.String publicId, java.lang.String systemId)
+//           throws SAXException, java.io.IOException
+//    {
+//      if (publicId.equals("--myDTDpublicID--"))
+//        // this deactivates the open office DTD
+//        return new InputSource(new ByteArrayInputStream("<?xml version='1.0' encoding='UTF-8'?>".getBytes()));
+//      else return null;
+//    }
+//});
 
 
-////DTD
-//// 6. Get DTD systemID
-//DocumentBuilder documentBuilder = 
-//Document document = documentBuilder.parse(xmlStreamReader);
-//String systemId = document.getDoctype().getSystemId();
-//
-//LOGGER.trace(MARKER, "Location SystemId: " + systemId);
-//if (systemId != null) {
-//  resSystemId = systemId;
-//  LOGGER.trace(MARKER, "Get DTD systemID: " + resSystemId);
-//  resSystemURL = getAbsoluteUrlFromRelativeOrAbsolute(resSystemId, xmlInputStreamSourceDir);
-//  break systemId;
-//}
-//
-//// 7. Get DTD publicID
-//String publicId = xmlStreamReader.getLocation().getPublicId();
-//LOGGER.trace(MARKER, "Location PublicId: " + publicId);
-//if (publicId != null) {
-//  resPublicId = publicId;
-//  LOGGER.trace(MARKER, "Get DTD publicID");
-//  resSystemURL = getAbsoluteUrlFromRelativeOrAbsolute(resPublicId, xmlInputStreamSourceDir);
-//  break publicId;
-//}

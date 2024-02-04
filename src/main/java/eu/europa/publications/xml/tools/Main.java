@@ -39,8 +39,8 @@ public final class Main {
 
     /**
      * Return a system exist's execution code describing to good or failed
-     * execution of the XSD 1.1 validation. The args is the arguments' list
-     * issued from the command line.
+     * execution of the XSD 1.1 validation of the input, the schema or the catalog. 
+     * The args is the arguments' list issued from the command line.
      * <p>
      * usage: XSD11Validator
      * <p>
@@ -83,7 +83,7 @@ public final class Main {
         
         try {
             final Option input = new Option("i", "input", true, "XML input file path");
-            input.setRequired(true);
+            input.setRequired(false);
             options.addOption(input);
 
             final Option schema = new Option("s", "schema", true, "XML schema file path");
@@ -102,8 +102,23 @@ public final class Main {
             final String schemaFilePath = cmd.getOptionValue("schema");
             final String catalogFilePath = cmd.getOptionValue("catalog");
             final XSD11Validator xsd11Validator = new XSD11Validator();
+            
+            if (inputFilePath != null) {
+                returnCode = xsd11Validator.validateXmlInstance(inputFilePath, schemaFilePath, catalogFilePath);
+            } else {
+                if (schemaFilePath != null) {
+                    returnCode = xsd11Validator.validateSchema(schemaFilePath, catalogFilePath);                
+                } else {
+                    if (catalogFilePath != null) {
+                        returnCode = xsd11Validator.validateXmlInstance(catalogFilePath, null, catalogFilePath);                
+                    } else {
+                        LOGGER.info(MARKER, "No provided parameters, at least one of -i -s or -c has to be present ");
+                        returnCode = 1;                
+                    }             
+                }
+                
+            }
 
-            returnCode = xsd11Validator.validateXmlInstance(inputFilePath, schemaFilePath, catalogFilePath);
         } catch (ParseException e) {
             LOGGER.error(MARKER, e.getMessage());
             formatter.printHelp("XSD11Validator", options);

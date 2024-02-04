@@ -162,14 +162,14 @@
 		        <configuration>
 				  <skip>false</skip>
 		          <transformationSets>
-<!--		            <transformationSet>
+		            <transformationSet>
 		                <dir>src/test/resources/eu/europa/publications/xml/testSuites/</dir>
 		                <includes>
 						  <include>suite.xml</include>
 					    </includes>
 		                <stylesheet>src/test/xslt/testSuiteGenerator.xsl</stylesheet>
-		            </transformationSet>-->
-		            <transformationSet>
+		            </transformationSet>
+<!--		            <transformationSet>
 		                <dir>../w3cXsdtests/</dir>
 		                <includes>
 						    <include>suite.xml</include>
@@ -185,7 +185,24 @@
 								<value>eu/europa/publications/xml/w3cXsdtests/</value>
 							</parameter>							
 						</parameters>		                
-		            </transformationSet>		            
+		            </transformationSet>-->
+<!--		            <transformationSet>
+		                <dir>../w3cXsdtests/</dir>
+		                <includes>
+						    <include>extra-suite.xml</include>
+					    </includes>
+		                <stylesheet>src/test/xslt/testSuiteGenerator.xsl</stylesheet>
+						<parameters>
+							<parameter>
+								<name>moduleName</name>
+								<value>eu.europa.publications.xml.w3cXsdtests</value>
+							</parameter>
+							<parameter>
+								<name>modulePath</name>
+								<value>eu/europa/publications/xml/w3cXsdtests/</value>
+							</parameter>							
+						</parameters>		                
+		            </transformationSet>-->	
 		          </transformationSets>
 		          <catalogs>
 		            <catalog>src/test/resources/eu/europa/publications/xml/common/catalog.xml</catalog>
