@@ -853,10 +853,17 @@ public final class XSD11Validator {
 
 }
 
+//Develop
+//TODO support NS -> static schema and check good schema if correct target NS/version and not only NS/file name
+
+//TODO add selector for version 1.0 or 1.1 (1.1 not fully backward compatble)
+//TODO add default catalog xml.xsd, ...
+//TODO support DTD by reorganization of code
 
 // Develop testsuite to:
-//xxxxTODO support check good schema if correct target NS and not file name
 //TODO ... Add use XSD1.1 test suite example
+//TODO ... Add use XSD1.1 test extra-suite example
+
 
 // Use different catalogs
 //TODO ... replicate test for catalog null, empty normal, public, system and referred
@@ -867,6 +874,7 @@ public final class XSD11Validator {
 //TODO Add DTD public identifier tests in Test Suite
 
 // Extend dev to support:
+//TODO ....Refactorize to check schema synthax
 //TODO ....Refactorize to check catalog
 
 // QC
