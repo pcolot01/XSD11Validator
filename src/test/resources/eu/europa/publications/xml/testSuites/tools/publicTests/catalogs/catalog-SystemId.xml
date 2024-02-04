@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
     <system systemId="../../../a/path/to/xerces-test.xsd" uri="file:../schemas/xerces-test.xsd"/>
+    <system systemId="http://mydomain.org/mygrammar" uri="file:../schemas/xerces-test.xsd"/>
+    
     <system systemId="urn:my:xercesTestUrn" uri="file:../schemas/xerces-test-Urn.xsd"/>
 </catalog>

@@ -3,7 +3,7 @@
 
 
 <testSet 
-      name="XSD11Validator"
+      name="NoParameters"
       description="XSD 1.1 validation test"
       xmlns="http://www.w3.org/XML/2004/xml-schema-test-suite/"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

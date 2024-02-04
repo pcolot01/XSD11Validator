@@ -3,5 +3,5 @@
     <system systemId="../../../a/path/to/xerces-test.xsd" uri="file:../../schemas/xerces-test.xsd"/>
     <public publicId="http://mydomain.org/mygrammar" uri="file:../../schemas/xerces-test.xsd"/>
 
-    <public publicId="urn:my:xercesTestUrn" uri="file:../schemas/xerces-test-Urn.xsd"/>
+    <public publicId="urn:my:xercesTestUrn" uri="file:../../schemas/xerces-test-Urn.xsd"/>
 </catalog>

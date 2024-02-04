@@ -4,7 +4,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xmlns:xlink="http://www.w3.org/1999/xlink" 
 	xsi:schemaLocation="http://www.w3.org/XML/2004/xml-schema-test-suite/ ../../common/xsts.xsd" 
-	name="TS_2023" 
+	name="TS_2024" 
 	releaseDate="2024-01-20" 
 	schemaVersion="W3C XML Schema 1.0 2nd edition">
  <ts:annotation>
@@ -13,5 +13,11 @@
 
  <ts:testSetRef xlink:href="NoParameters.testSet.xml"/>
  <ts:testSetRef xlink:href="DirectCatalog.testSet.xml"/>
+ <ts:testSetRef xlink:href="EmptyCatalog.testSet.xml"/>
+ <ts:testSetRef xlink:href="InvalidCatalog.testSet.xml"/>
+ <ts:testSetRef xlink:href="NullCatalog.testSet.xml"/>
+ <ts:testSetRef xlink:href="PublicUriCatalog.testSet.xml"/>
+ <ts:testSetRef xlink:href="SystemIdCatalog.testSet.xml"/>
+ <ts:testSetRef xlink:href="WithReferenceCatalog.testSet.xml"/>
 
 </ts:testSuite>
