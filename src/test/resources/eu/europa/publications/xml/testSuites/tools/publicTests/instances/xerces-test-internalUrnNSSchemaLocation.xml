@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pre:temp xmlns:pre="urn:my:xercesTestUrn"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:my:xercesTestUrn ../schemas/xerces-test-Urn.xsd"
+	x="350"/>

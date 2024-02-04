@@ -2,8 +2,8 @@ package eu.europa.publications.xml.tools;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URL;
 import java.net.URI;
+import java.net.URL;
 import java.net.Authenticator;
 import java.net.URISyntaxException;
 
@@ -269,9 +269,9 @@ public final class XSD11Validator {
             SAXNotRecognizedException, SAXNotSupportedException {
 
         // 1. Get schema name
-        URL xsdInputURL = getXsdURL(xsdInput, xmlInputStreamSource, catalogResolver);
+        URI xsdInputURI = getXsdURI(xsdInput, xmlInputStreamSource, catalogResolver);
         
-        return getSchema(xsdInputURL, catalogResolver);
+        return getSchema(xsdInputURI, catalogResolver);
     }
     
     /** Get Schema engine.
@@ -289,26 +289,26 @@ public final class XSD11Validator {
             SAXNotRecognizedException, SAXNotSupportedException {
 
         // 1. Get schema name
-        URL xsdInputURL = getURL(xsdInput);
+        URI xsdInputURI = getURI(xsdInput);
         
-        return getSchema(xsdInputURL, catalogResolver);
+        return getSchema(xsdInputURI, catalogResolver);
     } 
     
     /** Get Schema engine.
      * 
-     * @param xsdInputURL
+     * @param xsdInputURI
      * @param catalogResolver
      * @return The Schema
      * @throws ApplicationHandler The application exception handler
      * @throws SAXNotRecognizedException
      * @throws SAXNotSupportedException   */
     private static Schema getSchema(
-            final URL xsdInputURL,
+            final URI xsdInputURI,
             XMLCatalogResolver catalogResolver) throws ApplicationHandler,
             SAXNotRecognizedException, SAXNotSupportedException {
         
         // 1. Get the Validator
-        if (xsdInputURL != null) { LOGGER.trace(MARKER, "  using external xsd: " + xsdInputURL.toString()); }
+        if (xsdInputURI != null) { LOGGER.trace(MARKER, "  using external xsd: " + xsdInputURI.toString()); }
         LOGGER.trace(MARKER, "  and catalog: " + catalogResolver);
         
         // 2. Create a schema factory for XML 1.1
@@ -327,11 +327,11 @@ public final class XSD11Validator {
         //schemaFactory.setResourceResolver(new ResourceResolver());
 
         // 4. Get the schema
-        LOGGER.trace(MARKER, "Creating schema from " + xsdInputURL);
+        LOGGER.trace(MARKER, "Creating schema from " + xsdInputURI);
         Schema schema = null;
-        if (xsdInputURL != null) {
+        if (xsdInputURI != null) {
             try {
-                schema = schemaFactory.newSchema(xsdInputURL);
+                schema = schemaFactory.newSchema(xsdInputURI.toURL());
             } catch (Exception e) {
                 ApplicationHandler.error(e);
             }
@@ -342,61 +342,61 @@ public final class XSD11Validator {
         return schema;
     }
 
-    /** Get Xsd URL.
+    /** Get Xsd URI.
      * 
      * @param xsdInput
      * @param xmlInputStreamSource
      * @param catalogResolver
-     * @return The URL
+     * @return The URI
      * @throws ApplicationHandler The application exception handler
      * @throws SAXNotRecognizedException
      * @throws SAXNotSupportedException
      */
-    private static URL getXsdURL(
+    private static URI getXsdURI(
             final String xsdInput,
             StreamSource xmlInputStreamSource,
             XMLCatalogResolver catalogResolver) throws ApplicationHandler,
             SAXNotRecognizedException, SAXNotSupportedException {
         
-        // 1. Extract Xsd UrL
-        LOGGER.trace(MARKER, "Get Xsd URL from XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId());
+        // 1. Extract Xsd URI
+        LOGGER.trace(MARKER, "Get Xsd URI from XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId());
         if (xsdInput != null) { LOGGER.trace(MARKER, "  using external xsd: " + xsdInput); }
         LOGGER.trace(MARKER, "  and catalog: " + catalogResolver);
 
         // 2. Get the internal referred schema
-        URL internalSchemaNameURL = getXsdInternalURL(xmlInputStreamSource, catalogResolver);
-        LOGGER.trace(MARKER, "Extracted internal schema name URL: " + internalSchemaNameURL);
+        URI internalSchemaNameURI = getXsdInternalURI(xmlInputStreamSource, catalogResolver);
+        LOGGER.trace(MARKER, "Extracted internal schema name URI: " + internalSchemaNameURI);
         
-        if (internalSchemaNameURL == null) {
+        if (internalSchemaNameURI == null) {
             // Fall back to DTD
-            internalSchemaNameURL = getDtdInternalURL(xmlInputStreamSource, catalogResolver);
-            LOGGER.trace(MARKER, "Extracted internal DTD name URL: " + internalSchemaNameURL);
+            internalSchemaNameURI = getDtdInternalURI(xmlInputStreamSource, catalogResolver);
+            LOGGER.trace(MARKER, "Extracted internal DTD name URI: " + internalSchemaNameURI);
         }
         
         if (xsdInput == null) {
          // 3. Without forced schema used the resolved internal one
-            if (internalSchemaNameURL != null) {
-            URL xsdInputURL = internalSchemaNameURL;
+            if (internalSchemaNameURI != null) {
+            URI xsdInputURI = internalSchemaNameURI;
             
-            return xsdInputURL;
+            return xsdInputURI;
             } else {
                 throw new ApplicationHandler("Neither a nonamespace nor a namespace is attached to the root nor a default no namespace location is provided");
             }
         } else {
             // 4. Unless used the forced schema
             try {
-                URL xsdInputURL = getURL(xsdInput);
-                LOGGER.trace(MARKER, "XSD Schema Absolute Path: " + xsdInputURL);
+                URI xsdInputURI = getURI(xsdInput);
+                LOGGER.trace(MARKER, "XSD Schema Absolute Path: " + xsdInputURI);
                 
                 // check forced schema is equal to internal format unless warn
-                if ((internalSchemaNameURL != null) && (!xsdInputURL.toURI().equals(internalSchemaNameURL.toURI()))) {
+                if ((internalSchemaNameURI != null) && (!xsdInputURI.equals(internalSchemaNameURI))) {
                     LOGGER.warn(MARKER, "Internal schema name: "
-                            + internalSchemaNameURL
+                            + internalSchemaNameURI
                             + " differs from schema passed as argument: "
-                            + xsdInputURL);
+                            + xsdInputURI);
                 }
                 
-                return xsdInputURL;
+                return xsdInputURI;
             } catch ( ApplicationHandler a) {
                 throw a;
             } catch (Exception e) {
@@ -406,22 +406,22 @@ public final class XSD11Validator {
     }
     
     
-    /** Get the schema URL defined inside the XML instance.
+    /** Get the schema URI defined inside the XML instance.
      * 
      * @param xsdInput
      * @param xmlInputStreamSource
      * @param catalogResolver
-     * @return The URL
+     * @return The URI
      * @throws ApplicationHandler The application exception handler
      * @throws SAXNotRecognizedException
      * @throws SAXNotSupportedException
      */
-    private static URL getXsdInternalURL(
+    private static URI getXsdInternalURI(
             StreamSource xmlInputStreamSource,
             XMLCatalogResolver catalogResolver) throws ApplicationHandler {
         try {            
-            // 1. Extract Xsd UrL
-            LOGGER.trace(MARKER, "Get internal Xsd URL from XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId());
+            // 1. Extract Xsd URI
+            LOGGER.trace(MARKER, "Get internal Xsd URI from XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId());
             LOGGER.trace(MARKER, "  and catalog: " + catalogResolver);
             
             //2. Get the XML root qualified namespace 
@@ -502,7 +502,7 @@ public final class XSD11Validator {
                 } else {
                     LOGGER.trace(MARKER, "Successful Resolving of URI " + namespaceURI + " against Public catalog as " + resolvedId);                
                 }
-                return getURL(resolvedId);                
+                return getURI(resolvedId);                
             } else {
                 return null;
             }
@@ -514,22 +514,22 @@ public final class XSD11Validator {
     }
     
     
-    /** Get the DTD URL defined inside the XML instance.
+    /** Get the DTD URI defined inside the XML instance.
      * 
      * @param xsdInput
      * @param xmlInputStreamSource
      * @param catalogResolver
-     * @return The URL
+     * @return The URI
      * @throws ApplicationHandler The application exception handler
      * @throws SAXNotRecognizedException
      * @throws SAXNotSupportedException
      */
-    private static URL getDtdInternalURL(
+    private static URI getDtdInternalURI(
             StreamSource xmlInputStreamSource,
             XMLCatalogResolver catalogResolver) throws ApplicationHandler {
         try {            
-            // 1. Extract DTD UrL
-            LOGGER.trace(MARKER, "Get internal DTD URL from XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId());
+            // 1. Extract DTD URI
+            LOGGER.trace(MARKER, "Get internal DTD URI from XML Stream sysid: " +  xmlInputStreamSource.getSystemId() + ", publicId: " + xmlInputStreamSource.getPublicId());
             LOGGER.trace(MARKER, "  and catalog: " + catalogResolver);
             
             final InputStream inputStream = new URL(xmlInputStreamSource.getSystemId()).openStream();
@@ -601,7 +601,7 @@ public final class XSD11Validator {
                 } else {
                     LOGGER.trace(MARKER, "Successful Resolving of URI " + namespaceURI + " against Public catalog as " + resolvedId);                
                 }
-                return getURL(resolvedId);                
+                return getURI(resolvedId);                
             } else {
                 return null;
             }
@@ -614,7 +614,7 @@ public final class XSD11Validator {
     
     /** Get XML input stream. 
      * 
-     * @param xmlInput The URL of the XML input 
+     * @param xmlInput The URI of the XML input 
      * @throws ApplicationHandler The application exception handler
      * @return The Stream Source
      */
@@ -627,10 +627,10 @@ public final class XSD11Validator {
         // 2. if a input is provided
         if (xmlInput != null) {
             try {
-                // try to convert xmlInput as URL
-                URL url = getURL(xmlInput);
+                // try to convert xmlInput as URI
+                URI uri = getURI(xmlInput);
                 // create the stream
-                return new StreamSource(url.toString());
+                return new StreamSource(uri.toString());
             } catch ( ApplicationHandler a) {
                 throw a;
             } catch (Exception e) {
@@ -710,50 +710,50 @@ public final class XSD11Validator {
     
     /** Resolve the relative Path using the base path
      * 
-     * @param basePathOrURL The base path of the file or of the URL
-     * @param relativePath The relative path of the file or of the URL
+     * @param basePathOrURI The base path of the file or of the URI
+     * @param relativePath The relative path of the file or of the URI
      * @return The resolved path
      * @throws ApplicationHandler The application exception handler 
      */
-    public static String resolveRelativePath(String basePathOrURL, String relativePath) 
+    public static String resolveRelativePath(String basePathOrURI, String relativePath) 
             throws ApplicationHandler {
         
         File file = new File(relativePath);
         if (file.isAbsolute()) {
-            return getURL(relativePath).toString();
+            return getURI(relativePath).toString();
         } else {
-            if ( basePathOrURL.startsWith("urn:") ) {
+            if ( basePathOrURI.startsWith("urn:") ) {
                 
                 URI baseURI;
                 try {
-                    baseURI = new URI(basePathOrURL);
+                    baseURI = new URI(basePathOrURI);
                 } catch (URISyntaxException e) {
-                    throw new IllegalArgumentException("Invalid base URL: " + basePathOrURL);
+                    throw new IllegalArgumentException("Invalid base URI: " + basePathOrURI);
                 }
         
                 return baseURI.toString();
-            } else if ( basePathOrURL.startsWith("http:") || basePathOrURL.startsWith("https:") || basePathOrURL.startsWith("file:") ) {
-                basePathOrURL = basePathOrURL.substring(0, basePathOrURL.lastIndexOf("/") + 1);
+            } else if ( basePathOrURI.startsWith("http:") || basePathOrURI.startsWith("https:") || basePathOrURI.startsWith("file:") ) {
+                basePathOrURI = basePathOrURI.substring(0, basePathOrURI.lastIndexOf("/") + 1);
                 
                 URI baseURI;
                 try {
-                    baseURI = new URI(basePathOrURL);
+                    baseURI = new URI(basePathOrURI);
                 } catch (URISyntaxException e) {
-                    throw new IllegalArgumentException("Invalid base URL: " + basePathOrURL);
+                    throw new IllegalArgumentException("Invalid base URI: " + basePathOrURI);
                 }
         
                 URI resolvedURI;
                 try {
                     resolvedURI = baseURI.resolve(relativePath);
                 } catch (Exception e) {
-                    throw new IllegalArgumentException("Invalid relative URL path: " + relativePath);
+                    throw new IllegalArgumentException("Invalid relative URI path: " + relativePath);
                 }
         
                 return resolvedURI.toString();
             } else {
-                basePathOrURL = new File(basePathOrURL).getAbsolutePath();
+                basePathOrURI = new File(basePathOrURI).getAbsolutePath();
 
-                File resolved = new File(basePathOrURL, relativePath);
+                File resolved = new File(basePathOrURI, relativePath);
                 return resolved.getAbsolutePath();
             }            
         }
@@ -761,66 +761,66 @@ public final class XSD11Validator {
     }
 
         
-    /** Get the base path of a File or of an URL
+    /** Get the base path of a File or of an URI
      * 
-     * @param filePathOrURL Filename or URL to extract the path
+     * @param filePathOrURI Filename or URI to extract the path
      * @return The path
      * @throws ApplicationHandler The application exception handler
      */
-    public static String getBasePath(String filePathOrURL)
+    public static String getBasePath(String filePathOrURI)
             throws ApplicationHandler {
-        if (filePathOrURL.startsWith("http:") || filePathOrURL.startsWith("https:") || filePathOrURL.startsWith("file:") || filePathOrURL.startsWith("urn:")) {
-            // Extract the base path from a URL
+        if (filePathOrURI.startsWith("http:") || filePathOrURI.startsWith("https:") || filePathOrURI.startsWith("file:") || filePathOrURI.startsWith("urn:")) {
+            // Extract the base path from a URI
             URI uri;
             try {
-                uri = new URI(filePathOrURL);
+                uri = new URI(filePathOrURI);
             } catch (URISyntaxException e) {
-                throw new ApplicationHandler("Invalid URL: " + filePathOrURL);
+                throw new ApplicationHandler("Invalid URI: " + filePathOrURI);
             }
             return uri.getScheme() + "://" + uri.getHost() + "/" + uri.getPath().substring(0, uri.getPath().lastIndexOf("/") + 1);
         } else {            
             // Extract the base path from a file path
             try {
-                File file = new File(filePathOrURL);
+                File file = new File(filePathOrURI);
                 return file.getCanonicalPath() + "/";
             } catch (Exception e) {
-                throw new ApplicationHandler("Invalid URL: " + filePathOrURL);
+                throw new ApplicationHandler("Invalid URI: " + filePathOrURI);
             }
         } 
     }
 
     
-    /** Get Url from system or URL resource.
+    /** Get URI from system or URI resource.
      * 
-     * @param filePathOrURL Filename or URL to extract the URL
-     * @return The URL
+     * @param filePathOrURI Filename or URI to extract the URI
+     * @return The URI
      * @throws ApplicationHandler The application exception handler
      */
-    private static URL getURL(final String filePathOrURL)
+    private static URI getURI(final String filePathOrURI)
             throws ApplicationHandler {
     
-        // 1. Get the URL from system or http resource
-        LOGGER.trace(MARKER, "Get input URL from " + filePathOrURL);
+        // 1. Get the URI from system or http resource
+        LOGGER.trace(MARKER, "Get input URI from " + filePathOrURI);
         
-        // if any filePathOrURL is provided
-        if (filePathOrURL != null) {
+        // if any filePathOrURI is provided
+        if (filePathOrURI != null) {
             try {
-                if (filePathOrURL.startsWith("http:") || filePathOrURL.startsWith("https:") || filePathOrURL.startsWith("file:") || filePathOrURL.startsWith("urn:")) {
-                    // Extract the path as a URL
-                    return new URI(filePathOrURL).toURL();
+                if (filePathOrURI.startsWith("http:") || filePathOrURI.startsWith("https:") || filePathOrURI.startsWith("file:") || filePathOrURI.startsWith("urn:")) {
+                    // Extract the path as a URI
+                    return new URI(filePathOrURI);
                 } else {
                     // try to use input as a local file
     
                     // Create Stream source using filename
-                    File file = new File(filePathOrURL);
-                    URL fileURL = file.getCanonicalFile().toURI().toURL();
-                    return fileURL;
+                    File file = new File(filePathOrURI);
+                    URI fileURI = file.getCanonicalFile().toURI();
+                    return fileURI;
                 }
             } catch (Exception e) {
                 throw new ApplicationHandler(e);
             }
         } else {
-            throw new ApplicationHandler("No input to be converted to URL");
+            throw new ApplicationHandler("No input to be converted to URI");
         }
     }
 
@@ -854,10 +854,10 @@ public final class XSD11Validator {
 }
 
 //Develop
-//TODO support NS -> static schema and check good schema if correct target NS/version and not only NS/file name
 
 //TODO add selector for version 1.0 or 1.1 (1.1 not fully backward compatble)
 //TODO add default catalog xml.xsd, ...
+
 //TODO support DTD by reorganization of code
 
 // Develop testsuite to:
@@ -870,15 +870,16 @@ public final class XSD11Validator {
 //TODO ... Manage referred catalog in sub-directory
 //TODO ... Add public/system and asbolute/relative catalog resolutions for schema
 //TODO Add test with absolute references for xml input, xml schema, xml catalog
+
 //TODO Add DTD system identifier tests in Test Suite 
 //TODO Add DTD public identifier tests in Test Suite
 
-// Extend dev to support:
+// +++Extend dev to support:
 //TODO ....Refactorize to check schema synthax
 //TODO ....Refactorize to check catalog
 
-// QC
-//xxxxTODO Refactorize to reduce God Class (split in classes)
+// +++QC
+//TODO Refactorize to reduce God Class (split in classes)
 
 
 
